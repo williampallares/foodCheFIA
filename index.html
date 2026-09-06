@@ -1,123 +1,342 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>William's FoodAI 👨‍🍳</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #121214;
-            color: #e1e1e6;
-            text-align: center;
-            padding: 40px;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: #202024;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        h1 { color: #00b37e; font-size: 28px; }
-        input {
-            width: 80%;
-            padding: 12px;
-            border: 2px solid #29292e;
-            border-radius: 6px;
-            background: #121214;
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-        button {
-            background-color: #00b37e;
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        button:hover { background-color: #00875f; }
-        #respuesta {
-            margin-top: 25px;
-            padding: 15px;
-            background: #29292e;
-            border-radius: 6px;
-            text-align: left;
-            white-space: pre-line;
-            line-height: 1.5;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>foodChefIA - Recetario Global</title>
+
+<style>
+:root {
+  --bg-color: #f4f6f8;
+  --header-bg: red;
+  --chat-bg: #e0e0e0;
+  --msg-user: red;
+  --msg-ia-bg: #e0e0e0;
+  --msg-ia-text: #111;
+  --input-bg: #ffffff;
+  --input-text: #000000;
+  --menu-bg: #ffffff;
+  --menu-text: #333333;
+}
+
+body.dark-mode {
+  --bg-color: #121212;
+  --chat-bg: #1e1e1e;
+  --msg-ia-bg: #2a2a2a;
+  --msg-ia-text: #ffffff;
+  --input-bg: #1e1e1e;
+  --input-text: #ffffff;
+  --menu-bg: #252525;
+  --menu-text: #ffffff;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: var(--bg-color);
+  color: var(--input-text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: 0.3s;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 18px;
+  background: var(--header-bg);
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.header button {
+  background: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+}
+
+.chat {
+  height: 60vh;
+  overflow-y: auto;
+  padding: 15px;
+  background: var(--chat-bg);
+  border-radius: 12px;
+}
+
+.msg {
+  margin: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.user {
+  background: var(--msg-user);
+  color: white;
+  text-align: right;
+}
+
+.ia {
+  background: var(--msg-ia-bg);
+  color: var(--msg-ia-text);
+}
+
+.input-zone {
+  padding: 10px 15px;
+  background: var(--input-bg);
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  background: var(--input-bg);
+  color: var(--input-text);
+}
+
+button.btn-buscar {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  box-sizing: border-box;
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-copiar {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+/* Menú de Ajustes Antiguo */
+.menu {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 15px;
+  width: 270px;
+  background: var(--menu-bg);
+  color: var(--menu-text);
+  padding: 15px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
+  border-radius: 10px;
+  z-index: 100;
+}
+
+.menu h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.opcion-ajuste {
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.opcion-ajuste label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+
+.opcion-ajuste input[type="range"], 
+.opcion-ajuste select {
+  width: 100%;
+}
+</style>
 </head>
+
 <body>
 
-    <div class="container">
-        <h1>Chef Virtual AI 👨‍🍳</h1>
-        <p>Escribe qué ingredientes tienes en la nevera y William's AI te dirá qué cocinar:</p>
-        
-        <input type="text" id="ingredientes" placeholder="Ej: huevo, tomate, queso...">
-        <br>
-        <button onclick="pedirReceta()">¡Generar Receta!</button>
+<div class="header">
+  <span>🔍 foodChefIA - Recetario Global</span>
+  <button onclick="toggleMenu()">⚙️</button>
+</div>
 
-        <div id="respuesta">La IA está esperando tus ingredientes...</div>
-    </div>
+<!-- Menú de Ajustes -->
+<div id="menu" class="menu">
+  <h3>⚙️ Ajustes</h3>
+  
+  <div class="opcion-ajuste">
+    <label>
+      <input type="checkbox" id="checkOscuro" onchange="cambiarModoOscuro()"> 🌙 Modo Oscuro
+    </label>
+  </div>
 
-    <script>
-        async function pedirReceta() {
-            const input = document.getElementById('ingredientes').value.trim();
-            const respuestaDiv = document.getElementById('respuesta');
+  <div class="opcion-ajuste">
+    <label>🔊 Volumen de Voz</label>
+    <input type="range" id="volumenVoz" min="0" max="1" step="0.1" value="1">
+  </div>
 
-            if (!input) {
-                respuestaDiv.innerText = "⚠️ Por favor, escribe algún ingrediente.";
-                return;
-            }
+  <div class="opcion-ajuste">
+    <label>🗣️ Lectura de Receta (Voz)</label>
+    <select id="selectVoz">
+      <option value="es-ES">Español</option>
+    </select>
+  </div>
 
-            respuestaDiv.innerText = "🔄 El Chef IA está pensando en tu receta... Por favor espera.";
+  <div class="opcion-ajuste">
+    <label>🔤 Tamaño de Texto</label>
+    <select onchange="cambiarTamanoTexto(this.value)">
+      <option value="14px">Pequeño</option>
+      <option value="15px" selected>Normal</option>
+      <option value="18px">Grande</option>
+    </select>
+  </div>
 
-            // Le damos una estructura rígida para obligarla a responder como receta
-            const promptCompleto = `Actúa como un chef profesional. El usuario tiene únicamente estos ingredientes: ${input}.
-Crea una receta detallada usando este formato obligatorio:
+  <button onclick="toggleMenu()" style="width:100%; padding: 8px; background: red; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Cerrar</button>
+</div>
 
-🍳 NOMBRE DE LA RECETA
-⏱️ TIEMPO DE PREPARACIÓN:
+<div class="chat-container">
+  <div id="chat" class="chat"></div>
+</div>
 
-🛒 INGREDIENTES NECESARIOS:
-- Ingrediente 1
-- Ingrediente 2
+<div id="zonaBotonCopiar" style="padding: 0 15px;"></div>
 
-🔥 PASO A PASO:
-1. Primer paso
-2. Segundo paso
+<div class="input-zone">
+  <input id="input" type="text" placeholder="Pedí un ingrediente, un país o un estilo de comida...">
+  <button class="btn-buscar" onclick="enviar()">Buscar en foodChefIA</button>
+</div>
 
-💡 CONSEJO DEL CHEF:
-Un tip para que quede mejor.`;
+<script>
+const chat = document.getElementById("chat");
+let esperando = false;
+let ultimaRespuesta = "";
 
-            try {
-                // Dirección URL de la API de texto corregida con el signo $ y el modelo estético searchgpt
-                const url = `https://text.pollinations.ai/${encodeURIComponent(promptCompleto)}?model=searchgpt`;
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+function toggleMenu(){
+  let m = document.getElementById("menu");
+  m.style.display = (m.style.display === "block") ? "none" : "block";
+}
 
-                const data = await response.text();
-                
-                // Si la respuesta no vino vacía, la mostramos
-                if (data.trim() !== "") {
-                    respuestaDiv.innerText = data;
-                } else {
-                    throw new Error("Respuesta vacía");
-                }
+function cambiarModoOscuro(){
+  document.body.classList.toggle("dark-mode");
+}
 
-            } catch (error) {
-                respuestaDiv.innerText = "❌ ¡Ups! Ocurrió un error al conectar con la IA. Inténtalo de nuevo en unos segundos.";
-            }
-        }
-    </script>
+function cambiarTamanoTexto(val){
+  const mensajes = document.querySelectorAll('.msg');
+  mensajes.forEach(m => m.style.fontSize = val);
+}
+
+function add(txt, type){
+  let d = document.createElement("div");
+  d.className = "msg " + type;
+  d.innerText = txt;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+function mostrarBotonCopiar(){
+  const contenedor = document.getElementById("zonaBotonCopiar");
+  contenedor.innerHTML = "";
+
+  let btn = document.createElement("button");
+  btn.className = "btn-copiar";
+  btn.innerText = "📋 Copiar Fichas de foodChefIA";
+
+  btn.onclick = async () => {
+    try {
+      await navigator.clipboard.writeText(ultimaRespuesta);
+      alert("✅ ¡Fichas copiadas al portapapeles!");
+    } catch (err) {
+      alert("❌ No se pudo copiar.");
+    }
+  };
+
+  contenedor.appendChild(btn);
+}
+
+async function enviar(){
+  if(esperando) return;
+
+  let txt = document.getElementById("input").value.trim();
+  if(!txt) return;
+
+  esperando = true;
+  add(txt, "user");
+  let msg = add("🌍 Buscando en el Recetario Mundial...", "ia");
+  document.getElementById("input").value = ""; 
+
+  // Prompt para que actúe como un recetario internacional completo
+  let instrucciones = `Sos un RECETARIO INTERNACIONAL Y MUNDIAL. Tu base de datos contiene recetas de todas las culturas del mundo (comida asiática, mexicana, italiana, criolla, mediterránea, etc.).
+
+El usuario pide: "${txt}".
+
+Instrucciones:
+1. Muestra una variedad de recetas de DIFERENTES CULTURAS O ESTILOS de cocina para lo que pidió el usuario.
+2. Si pide un ingrediente (ej. "arroz"), muestra cómo lo preparan en distintas partes del mundo (ej. Arroz Frito Chino, Risotto Italiano, Arroz a la Mexicana, Paella Española).
+3. Usa SIEMPRE esta ficha obligatoria para cada receta:
+
+🔍 OPCIÓN [Número]: [NOMBRE DE LA RECETA - ORIGEN/CULTURA EN MAYÚSCULAS]
+
+⏱️ TIEMPO: [Tiempo] | PORCIONES: [Cantidad]
+
+🛒 INGREDIENTES:
+- [Ingrediente 1]
+- [Ingrediente 2]
+
+🔥 PREPARACIÓN PASO A PASO:
+1. [Paso 1]
+2. [Paso 2]
+
+💡 SECRETO DEL CHEF: [Tip o truco cultural]
+🧊 CONSERVACIÓN: [Cómo guardarlo]
+
+--------------------------------------------------`;
+
+  try {
+    let url = `https://text.pollinations.ai/${encodeURIComponent(instrucciones)}?model=openai`;
+    let res = await fetch(url);
+
+    if(res.ok) {
+      let texto = await res.text();
+      if(texto && texto.length > 30) {
+        msg.innerText = texto;
+        ultimaRespuesta = texto;
+        mostrarBotonCopiar();
+      } else {
+        msg.innerText = "⚠️ No se encontraron recetas en este intento. Probá buscar de nuevo.";
+      }
+    } else {
+      msg.innerText = "⚠️ Error de conexión con el servidor.";
+    }
+  } catch(e) {
+    msg.innerText = "⚠️ Error de red al intentar buscar.";
+  }
+
+  esperando = false;
+}
+</script>
 </body>
 </html>
