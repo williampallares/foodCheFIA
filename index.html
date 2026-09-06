@@ -183,12 +183,12 @@ body{margin:0;font-family:Arial, sans-serif;background:#f4f6f8;transition:0.3s;}
 <button id="btnEnviar" onclick="enviar()">Buscar en FoodChefIA</button>
 
 <script>
-// Registro del Service Worker
+// ================= REGISTRO DE SERVICE WORKER =================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-      .catch(err => console.error('Error al registrar el Service Worker:', err));
+      .then(reg => console.log('Service Worker activo:', reg.scope))
+      .catch(err => console.error('Error al registrar Service Worker:', err));
   });
 }
 
