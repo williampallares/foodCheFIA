@@ -1,591 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FoodSaverIA</title>
-
-<style>
-body{margin:0;font-family:Arial, sans-serif;background:#f4f6f8;transition:0.3s;}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items: center;
-  padding:15px;
-  background:red;
-  color:white;
-  font-weight: bold;
-}
-
-.header button {
-  width: auto !important;
-  margin: 0 !important;
-  padding: 5px 10px !important;
-}
-
-.chat{
-  height:52vh;
-  overflow-y:auto;
-  padding:10px;
-  background:white;
-  border-bottom: 1px solid #ccc;
-}
-
-.msg{margin:6px;padding:12px;border-radius:12px;white-space: pre-wrap; max-width: 80%;}
-.user{background:red;color:white;text-align:right; margin-left: auto;}
-.ia{background:#e0e0e0; color: black; margin-right: auto;}
-
-/* BANNER DE ANUNCIO PREMIUM */
-.banner-promo {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
-  border: 1px solid #ffeba8;
-  padding: 10px 15px;
-  margin: 8px 10px 0 10px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #856404;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.banner-promo button {
-  background: #ff4747;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#input, #btnEnviar {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  box-sizing: border-box;
-}
-
-.menu{
-  display:none;
-  position:fixed;
-  top:60px;
-  left:5%;
-  width:90%;
-  background:white;
-  padding:15px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-  z-index: 100;
-  border-radius: 8px;
-}
-
-/* DISEÑO DE LOS BOTONES DEL MENÚ */
-.menu button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  box-sizing: border-box;
-  background: #ff4747;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.menu button:hover {
-  background: #e03838;
-}
-
-#btnCambiarCuenta {
-  background: #6c757d !important;
-}
-
-#loginModal {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 85%;
-  max-width: 350px;
-  box-shadow: 0px 10px 25px rgba(0,0,0,0.3);
-  text-align: center;
-}
-.modal-content input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 16px;
-}
-.modal-content button {
-  width: 100%;
-  padding: 12px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-}
-</style>
-</head>
-
-<body onload="iniciarSesion()">
-
-<div id="loginModal">
-  <div class="modal-content">
-    <h2 style="margin:0; color:red;">FoodSaverIA</h2>
-    <p style="margin:5px 0 0 0; color:#555;">¡Ingresá tu nombre para empezar!</p>
-    <input id="nombreUser" placeholder="Tu nombre" onkeydown="evaluarEnterLogin(event)">
-    <button onclick="guardarPerfil()">Entrar</button>
-  </div>
-</div>
-
-<div class="header">
-<span>🍳 FoodSaverIA</span>
-<button onclick="toggleMenu()">⚙️</button>
-</div>
-
-<div id="menu" class="menu">
-
-🔊 Voz <input type="checkbox" id="voz"><br><br>
-
-🎚 Tono
-<input type="range" id="tono" min="0.5" max="2" step="0.1" value="1"><br><br>
-
-🌗 Brillo
-<input type="range" id="pantalla" min="0" max="100" value="50"><br><br>
-
-<h3>⭐ Premium</h3>
-<div id="opcionesCompra">
-  <button onclick="comprar(1)">1 mes - $5</button>
-  <button onclick="comprar(2)">2 meses - $9</button>
-  <button onclick="comprar(5)">5 meses - $20</button>
-</div>
-
-<p id="estadoPremium">❌ Cuenta Gratuita</p>
-<button id="btnDesuscribir" onclick="desuscribirse()" style="display:none; background: #ff4d4d; color: white;">Cancelar Suscripción</button>
-
-<br><br>
-<button id="btnCambiarCuenta" onclick="cambiarPerfil()">👤 Cambiar de Cuenta / Nueva Cuenta</button>
-
-</div>
-
-<div id="chat" class="chat"></div>
-
-<!-- BANNER ANUNCIO CON OFERTAS DINÁMICAS -->
-<div id="bannerAnuncio" class="banner-promo">
-  <span id="textoAnuncio">✨ <b>¡Desbloqueá recetas Michelin elaboradas!</b> Por solo <b>$5</b>/mes.</span>
-  <button onclick="toggleMenu()">Ver Planes</button>
-</div>
-
-<input id="input" placeholder="Ej: arroz pollo o una pregunta de cocina" onkeydown="evaluarEnterChat(event)">
-<button id="btnEnviar" onclick="enviar()">Enviar</button>
-
-<script>
-const chat = document.getElementById("chat");
-const voz = document.getElementById("voz");
-const tono = document.getElementById("tono");
-const pantalla = document.getElementById("pantalla");
-
-let perfil = null;
-let esperando = false;
-let ultimaReceta = "";
-
-function evaluarEnterLogin(e) {
-  if (e.key === "Enter") {
-    guardarPerfil();
-  }
-}
-
-function evaluarEnterChat(e) {
-  if (e.key === "Enter") {
-    enviar();
-  }
-}
-
-// ================= PERFIL Y LOGUEO =================
-
-function iniciarSesion(){
-  let data = localStorage.getItem("perfil");
-
-  if(data){
-    perfil = JSON.parse(data);
-    document.getElementById("loginModal").style.display="none";
-    
-    if(perfil.esPremium === undefined || !perfil.fechaVencimiento) {
-      perfil.esPremium = false;
-      perfil.fechaVencimiento = null;
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-    }
-    
-    verificarVencimiento();
-    actualizarInterfazPremium();
-    chat.innerHTML = ""; 
-    
-    add("👨‍🍳 Hola " + perfil.nombre + ", ¿qué querés cocinar u ordenar hoy?", "ia");
-    
-    if(perfil.esPremium) {
-      let fechaStr = new Date(perfil.fechaVencimiento).toLocaleDateString();
-      add("⭐ Tu suscripción Premium está activa hasta el " + fechaStr + ".", "ia");
-      add("⚠️ AVISO: La IA funciona con una API Key pública, entonces las respuestas tardan más en enviarse y el sistema global puede ser inestable. Como usuario Premium, tenés prioridad de procesamiento dentro del canal disponible.", "ia");
-    } else {
-      add("⚠️ ADVERTENCIA: La IA funciona con una API Key pública, entonces las respuestas tardan más en enviarse, el motor es inestable y presenta errores constantes en la versión gratuita.", "ia");
-    }
-  } else {
-    document.getElementById("loginModal").style.display="flex";
-  }
-}
-
-function guardarPerfil(){
-  let nombre = document.getElementById("nombreUser").value.trim();
-  if(!nombre) return alert("Poné tu nombre");
-
-  perfil = { 
-    nombre: nombre,
-    esPremium: false,
-    fechaVencimiento: null
-  };
-  
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-  iniciarSesion();
-}
-
-function cambiarPerfil(){
-  let nuevo = prompt("Nombre del nuevo usuario:");
-
-  if(nuevo && nuevo.trim() !== ""){
-    perfil = {
-      nombre: nuevo.trim(),
-      esPremium: false,
-      fechaVencimiento: null
-    };
-    localStorage.setItem("perfil", JSON.stringify(perfil));
-    iniciarSesion();
-    toggleMenu();
-  }
-}
-
-// ================= CONTROL DE VENCIMIENTO DE SUSCRIPCIÓN =================
-
-function verificarVencimiento(){
-  if(perfil && perfil.esPremium && perfil.fechaVencimiento){
-    let hoy = new Date().getTime();
-    if(hoy > perfil.fechaVencimiento){
-      perfil.esPremium = false;
-      perfil.fechaVencimiento = null;
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-      alert("⏰ Tu plan Premium ha vencido. Has vuelto a la versión Gratuita.");
-    }
-  }
-}
-
-// ================= ROTACIÓN DE ANUNCIOS =================
-
-function rotarAnuncio() {
-  const ofertas = [
-    "✨ <b>¡Desbloqueá recetas Michelin elaboradas con tips!</b> Por solo <b>$5</b>/mes.",
-    "🔥 <b>¡Oferta especial!</b> 2 meses de recetas completas por <b>$9</b>.",
-    "👑 <b>¡Ahorrá más!</b> 5 meses de acceso total Premium por solo <b>$20</b>."
-  ];
-  
-  const aleatorio = Math.floor(Math.random() * ofertas.length);
-  document.getElementById("textoAnuncio").innerHTML = ofertas[aleatorio];
-}
-
-// ================= PREMIUM =================
-
-function actualizarInterfazPremium() {
-  const estado = document.getElementById("estadoPremium");
-  const opciones = document.getElementById("opcionesCompra");
-  const btnDesuscribir = document.getElementById("btnDesuscribir");
-  const bannerAnuncio = document.getElementById("bannerAnuncio");
-
-  if(perfil && perfil.esPremium && perfil.fechaVencimiento){
-    let fechaStr = new Date(perfil.fechaVencimiento).toLocaleDateString();
-    estado.innerText = "✅ Premium Activo (Vence: " + fechaStr + ")";
-    opciones.style.display = "none";
-    btnDesuscribir.style.display = "block";
-    bannerAnuncio.style.display = "none"; 
-  } else {
-    estado.innerText = "❌ Cuenta Gratuita (No podés copiar recetas)";
-    opciones.style.display = "block";
-    btnDesuscribir.style.display = "none";
-    bannerAnuncio.style.display = "flex"; 
-    rotarAnuncio(); 
-  }
-}
-
-function comprar(meses){
-  if(!perfil) return;
-
-  let fechaActual = new Date();
-  fechaActual.setMonth(fechaActual.getMonth() + meses);
-
-  perfil.esPremium = true;
-  perfil.fechaVencimiento = fechaActual.getTime();
-  
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-  
-  actualizarInterfazPremium();
-  let fechaStr = fechaActual.toLocaleDateString();
-  add("⭐ ¡Gracias por hacerte Premium por " + meses + " mes(es)! Tu suscripción estará activa hasta el " + fechaStr + ".", "ia");
-}
-
-function desuscribirse(){
-  if(!perfil) return;
-
-  perfil.esPremium = false;
-  perfil.fechaVencimiento = null;
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-
-  actualizarInterfazPremium();
-  add("🛑 Te desuscribiste del Premium. Volviste al plan gratuito.", "ia");
-}
-
-// ================= EFECTO MÁQUINA DE ESCRIBIR =================
-function escribirEfecto(elemento, texto) {
-  let i = 0;
-  elemento.innerText = ""; 
-  
-  function tipeado() {
-    if (i < texto.length) {
-      elemento.innerText += texto.charAt(i);
-      i++;
-      chat.scrollTop = chat.scrollHeight; 
-      setTimeout(tipeado, 15); 
-    } else {
-      mostrarBotonGuardar();
-      hablar(texto);
-      esperando = false; 
-    }
-  }
-  tipeado();
-}
-
-// ================= COPIAR RECETAS (DEFINITIVO Y UNIVERSAL) =================
-
-function copiarTextoUniversal(texto) {
-  if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(texto);
-  } else {
-    // Fallback garantizado para entornos locales (file:///) o navegadores antiguos
-    return new Promise((resolve, reject) => {
-      let textArea = document.createElement("textarea");
-      textArea.value = texto;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        let exito = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        if (exito) resolve();
-        else reject();
-      } catch (err) {
-        document.body.removeChild(textArea);
-        reject(err);
-      }
-    });
-  }
-}
-
-function mostrarBotonGuardar(){
-  const btnExistente = document.getElementById("btnCopiarReceta");
-  if(btnExistente) btnExistente.remove();
-
-  let btn = document.createElement("button");
-  btn.id = "btnCopiarReceta";
-  btn.innerText = "📋 Copiar respuesta al portapapeles";
-  btn.style.background = "#4CAF50";
-  btn.style.color = "white";
-
-  btn.onclick = () => {
-    if(!perfil || !perfil.esPremium) {
-      alert("🔒 Esta función es exclusiva para usuarios Premium ⭐. ¡Suscribite desde el menú para habilitar la copia de respuestas!");
-      return;
-    }
-    
-    copiarTextoUniversal(ultimaReceta)
-      .then(() => alert("✅ ¡Texto copiado con éxito!"))
-      .catch(() => alert("❌ No se pudo copiar automáticamente. Por favor seleccioná el texto manualmente."));
-  };
-
-  chat.appendChild(btn);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-// ================= MENU =================
-
-function toggleMenu(){
-  let m=document.getElementById("menu");
-  m.style.display = m.style.display==="block"?"none":"block";
-}
-
-// ================= BRILLO =================
-
-pantalla.addEventListener("input",()=>{
-  let val = Number(pantalla.value);
-  let bg = 255 - val * 2;
-
-  document.body.style.background = `rgb(${bg},${bg},${bg})`;
-  chat.style.background = `rgb(${Math.max(bg+20,20)},${Math.max(bg+20,20)},${Math.max(bg+20,20)})`;
-
-  const header = document.querySelector(".header");
-  if(val >= 50){
-    header.style.background = "#ff8800";
-  }else{
-    header.style.background = "red";
-  }
-});
-
-// ================= CHAT =================
-
-function add(txt,type){
-  let d=document.createElement("div");
-  d.className="msg "+type;
-  d.innerText=txt;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
-  return d;
-}
-
-// ================= VOZ =================
-
-function hablar(txt){
-  if(!voz.checked) return;
-
-  let s=new SpeechSynthesisUtterance(txt);
-  s.pitch=parseFloat(tono.value);
-  
-  let txtMin = txt.toLowerCase();
-  if (txtMin.includes("ingredients:") || txtMin.includes("step by step:") || txtMin.includes("chef's tip:")) {
-    s.lang = "en-US";
-  } else {
-    s.lang = "es-ES";
-  }
-
-  speechSynthesis.cancel();
-  speechSynthesis.speak(s);
-}
-
-// ================= IA RECETAS E INTERROGANTES =================
-
-async function enviar() {
-  if (esperando) {
-    add("⏳ Esperá un momento...", "ia");
-    return;
-  }
-
-  verificarVencimiento();
-
-  let inputEl = document.getElementById("input");
-  let txt = inputEl.value.trim();
-  if (!txt) return;
-
-  add(txt, "user");
-  inputEl.value = "";
-
-  esperando = true;
-  
-  let mensajeCarga = perfil.esPremium 
-    ? "⭐ Procesando consulta en canal Premium prioritario..." 
-    : "🤖 Buscando receta en el servidor público...";
-    
-  let elIA = add(mensajeCarga, "ia");
-
-  let tiempoEspera = perfil.esPremium ? 0 : 2000;
-
-  setTimeout(async () => {
-    if (!perfil.esPremium && Math.random() < 0.2) {
-      elIA.innerText = "⚠️ Error de conexión con la API pública. Intentá enviar el mensaje de nuevo.";
-      esperando = false;
-      return;
-    }
-
-    let instruccionesIA = "";
-    let txtMin = txt.toLowerCase();
-    let esPreguntaTecnica = txtMin.includes("?") || txtMin.includes("como") || txtMin.includes("cómo") || txtMin.includes("cuanto") || txtMin.includes("cuánto") || txtMin.includes("que") || txtMin.includes("qué") || txtMin.includes("temperatura") || txtMin.includes("tiempo") || txtMin.includes("porque");
-
-    let reglaIdioma = "OBLIGATORIO: Detecta el idioma del usuario basándote en '" + txt + "' y responde COMPLETAMENTE en ese mismo idioma. Traduce de inmediato las estructuras, títulos, secciones, ingredientes, procedimientos y la pregunta final al idioma del usuario. ";
-
-    if (perfil && perfil.esPremium) {
-      // PREMIUM: RECETA COMPLETA Y ELABORADA CON TIPS Y CONSERVACIÓN
-      if (esPreguntaTecnica) {
-        instruccionesIA = reglaIdioma + "Actúa como un Chef Profesional de nivel Michelin. Responde la siguiente duda: " + txt + ". Tu respuesta DEBE ser clara, super limpia y perfectamente estructurada en el idioma detectado. Usa viñetas para enumerar datos técnicos y deja un renglón en blanco entre cada sección. Usa emojis. Al final, haz una pregunta abierta, atractiva y súper personalizada en su mismo idioma sobre el plato o tema hablado para seguir charlando.";
-      } else {
-        instruccionesIA = reglaIdioma + "Actúa como un Chef Profesional de nivel Michelin. Crea una receta con: " + txt + ". Tu respuesta DEBE estar perfectamente ordenada sección por sección en el idioma del usuario usando este formato exacto completamente traducido a su idioma:\n\n🍳 [Nombre de la receta]\n\n⏱️ TIEMPO Y PORCIONES:\n\n🛒 INGREDIENTES:\n- (Detalles)\n\n🔥 PASO A PASO:\n1. (Pasos)\n\n💡 CONSEJO DEL CHEF:\n\n🧊 CONSERVACIÓN:\n\nImportante: Deja espacios vacíos entre secciones. Al final del todo, añade una pregunta súper ingeniosa en su mismo idioma ligada a los ingredientes usados para mantener al usuario interesado en seguir hablando.";
-      }
-    } else {
-      // GRATUITO: RECETA BÁSICA SIN TIPS NI CONSERVACIÓN
-      if (esPreguntaTecnica) {
-        instruccionesIA = reglaIdioma + "Responde en un solo renglón muy corto, directo y sin formato a: " + txt + ". Termina obligatoriamente con una pregunta de cocina muy corta en el mismo idioma para que el usuario responda.";
-      } else {
-        instruccionesIA = reglaIdioma + "Dame una receta MUY BÁSICA, SIMPLE Y POCO ELABORADA con: " + txt + ". Solo lista 3 o 4 ingredientes principales y 2 pasos de preparación extremadamente sencillos en un bloque continuo. NO INCLUYAS consejos del chef, ni tips, ni datos de conservación. Al final de la línea, añade una pregunta corta preguntando si le gustaría una versión más completa con consejos de chef.";
-      }
-    }
-
-    let intentos = 0;
-    let exito = false;
-    let respuestaIA = "";
-
-    while (intentos < 3 && !exito) {
-      try {
-        intentos++;
-        if (intentos > 1) {
-          elIA.innerText = "⏳ Servidor inestable... Reintentando conexión (Intento " + intentos + "/3)...";
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>William's FoodAI 👨‍🍳</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121214;
+            color: #e1e1e6;
+            text-align: center;
+            padding: 40px;
         }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #202024;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        h1 { color: #00b37e; font-size: 28px; }
+        input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #29292e;
+            border-radius: 6px;
+            background: #121214;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #00b37e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #00875f; }
+        #respuesta {
+            margin-top: 25px;
+            padding: 15px;
+            background: #29292e;
+            border-radius: 6px;
+            text-align: left;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
 
-        const url = "https://text.pollinations.ai/" + encodeURIComponent(instruccionesIA);
-        const respuesta = await fetch(url);
-
-        if (!respuesta.ok) throw new Error("Caída de servidor");
+    <div class="container">
+        <h1>Chef Virtual AI 🍳</h1>
+        <p>Escribe qué ingredientes tienes en la nevera y William's AI te dirá qué cocinar:</p>
         
-        respuestaIA = await respuesta.text();
-        exito = true;
-      } catch (error) {
-        console.warn("Intento " + intentos + " fallido.");
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-    }
+        <input type="text" id="ingredientes" placeholder="Ej: huevo, tomate, queso...">
+        <br>
+        <button onclick="pedirReceta()">¡Generar Receta!</button>
 
-    if (exito) {
-      ultimaReceta = respuestaIA.trim();
-      
-      if (perfil.esPremium) {
-        escribirEfecto(elIA, ultimaReceta);
-      } else {
-        elIA.innerText = ultimaReceta;
-        mostrarBotonGuardar();
-        hablar(ultimaReceta);
-        rotarAnuncio(); 
-        esperando = false;
-      }
-    } else {
-      elIA.innerText = "❌ El motor de Pollinations está totalmente caído en este momento. ¡Volvé a intentar en unos segundos!";
-      esperando = false;
-    }
-  }, tiempoEspera);
-}
-</script>
+        <div id="respuesta">La IA está esperando tus ingredientes...</div>
+    </div>
 
+    <script>
+        async function pedirReceta() {
+            const input = document.getElementById('ingredientes').value;
+            const respuestaDiv = document.getElementById('respuesta');
+
+            if (!input) {
+                respuestaDiv.innerText = "⚠️ Por favor, escribe algún ingrediente.";
+                return;
+            }
+
+            respuestaDiv.innerText = "🔄 El Chef IA está pensando en tu receta... Por favor espera.";
+
+            // Aquí creamos la pregunta exacta para la IA
+            const promptCompleto = `Eres un chef experto. El usuario tiene estos ingredientes: ${input}. Sugiere una receta rápida, fácil y deliciosa detallando los pasos.`;
+
+            try {
+                // Hacemos la llamada mágica a Pollinations pasándole nuestra pregunta en la URL
+                const response = await fetch(`https://pollinations.ai{encodeURIComponent(promptCompleto)}`);
+                
+                if (!response.ok) throw new Error();
+
+                const data = await response.text();
+                respuestaDiv.innerText = data; // Mostramos la receta en la pantalla
+
+            } catch (error) {
+                respuestaDiv.innerText = "❌ ¡Ups! El servidor de la IA está saturado en este momento. Inténtalo de nuevo en unos segundos.";
+            }
+        }
+    </script>
 </body>
 </html>
