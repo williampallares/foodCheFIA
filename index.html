@@ -57,8 +57,8 @@
 <body>
 
     <div class="container">
-        <h1>FoodChefIA 🍳</h1>
-        <p>Escribe qué ingredientes tienes en la heladera y FoodChefIA te dirá qué cocinar:</p>
+        <h1>Chef Virtual AI - FoodChefIA 🍳</h1>
+        <p>Escribe qué ingredientes tienes en la nevera y FoodChefIA te dirá qué cocinar:</p>
         
         <input type="text" id="ingredientes" placeholder="Ej: huevo, tomate, queso...">
         <br>
@@ -72,8 +72,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-                    .catch(err => console.error('Error al registrar el Service Worker:', err));
+                    .then(reg => console.log('Service Worker registrado:', reg.scope))
+                    .catch(err => console.error('Error al registrar Service Worker:', err));
             });
         }
 
@@ -88,7 +88,7 @@
 
             respuestaDiv.innerText = "🔄 FoodChefIA está pensando en tu receta... Por favor espera.";
 
-            const promptCompleto = `Eres FoodChefIA, un chef experto y amigable. El usuario tiene estos ingredientes: ${input}. Preséntate brevemente como FoodChefIA y sugiere una receta rápida, fácil y deliciosa detallando los pasos.`;
+            const promptCompleto = `Eres FoodChefIA, un chef experto. El usuario tiene estos ingredientes: ${input}. Sugiere una receta rápida, fácil y deliciosa detallando los pasos.`;
 
             try {
                 const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptCompleto)}`);
@@ -99,7 +99,7 @@
                 respuestaDiv.innerText = data;
 
             } catch (error) {
-                respuestaDiv.innerText = "❌ ¡Ups! El servidor de FoodChefIA está saturado o estás sin conexión. Inténtalo de nuevo en unos segundos.";
+                respuestaDiv.innerText = "❌ ¡Ups! El servidor de FoodChefIA está saturado. Inténtalo de nuevo en unos segundos.";
             }
         }
     </script>
