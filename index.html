@@ -137,7 +137,6 @@ button.btn-buscar {
   display: inline-block;
 }
 
-/* Menú de Ajustes Antiguo */
 .menu {
   display: none;
   position: fixed;
@@ -225,7 +224,7 @@ button.btn-buscar {
 <div id="zonaBotonCopiar" style="padding: 0 15px;"></div>
 
 <div class="input-zone">
-  <input id="input" type="text" placeholder="Pedí un ingrediente, un país o un estilo de comida...">
+  <input id="input" type="text" placeholder="Pedí un ingrediente, un país o un estilo de comida..." onkeypress="if(event.key === 'Enter') enviar()">
   <button class="btn-buscar" onclick="enviar()">Buscar en foodChefIA</button>
 </div>
 
@@ -233,6 +232,9 @@ button.btn-buscar {
 const chat = document.getElementById("chat");
 let esperando = false;
 let ultimaRespuesta = "";
+
+// Colocá la URL de tu API en esta variable si la tenés
+const URL_API_DUCK = "";
 
 function toggleMenu(){
   let m = document.getElementById("menu");
@@ -285,18 +287,16 @@ async function enviar(){
 
   esperando = true;
   add(txt, "user");
-  let msg = add("🌍 Buscando en el Recetario Mundial...", "ia");
+  let msg = add("🌍 Buscando recetas en el recetario...", "ia");
   document.getElementById("input").value = ""; 
 
-  // Prompt para que actúe como un recetario internacional completo
-  let instrucciones = `Sos un RECETARIO INTERNACIONAL Y MUNDIAL. Tu base de datos contiene recetas de todas las culturas del mundo (comida asiática, mexicana, italiana, criolla, mediterránea, etc.).
+  let promptInstrucciones = `Sos un RECETARIO INTERNACIONAL Y MUNDIAL. Tu base de datos contiene recetas de todas las culturas del mundo.
 
 El usuario pide: "${txt}".
 
 Instrucciones:
-1. Muestra una variedad de recetas de DIFERENTES CULTURAS O ESTILOS de cocina para lo que pidió el usuario.
-2. Si pide un ingrediente (ej. "arroz"), muestra cómo lo preparan en distintas partes del mundo (ej. Arroz Frito Chino, Risotto Italiano, Arroz a la Mexicana, Paella Española).
-3. Usa SIEMPRE esta ficha obligatoria para cada receta:
+Muestra una variedad de recetas de DIFERENTES CULTURAS O ESTILOS para lo que pidió el usuario.
+Usa SIEMPRE esta ficha obligatoria para cada receta:
 
 🔍 OPCIÓN [Número]: [NOMBRE DE LA RECETA - ORIGEN/CULTURA EN MAYÚSCULAS]
 
@@ -316,20 +316,34 @@ Instrucciones:
 --------------------------------------------------`;
 
   try {
-    let url = `https://text.pollinations.ai/${encodeURIComponent(instrucciones)}?model=openai`;
-    let res = await fetch(url);
+    let response;
 
-    if(res.ok) {
-      let texto = await res.text();
-      if(texto && texto.length > 30) {
+    if (URL_API_DUCK) {
+      response = await fetch(URL_API_DUCK, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: promptInstrucciones, message: promptInstrucciones })
+      });
+    } else {
+      response = await fetch("https://text.pollinations.ai/" + encodeURIComponent(promptInstrucciones) + "?model=mistral&cache=false");
+    }
+
+    if(response.ok) {
+      let texto = await response.text();
+      try {
+        let json = JSON.parse(texto);
+        texto = json.text || json.response || json.result || texto;
+      } catch(e){}
+
+      if(texto && texto.length > 20) {
         msg.innerText = texto;
         ultimaRespuesta = texto;
         mostrarBotonCopiar();
       } else {
-        msg.innerText = "⚠️ No se encontraron recetas en este intento. Probá buscar de nuevo.";
+        msg.innerText = "⚠️ No se recibió respuesta. Por favor intentá de nuevo.";
       }
     } else {
-      msg.innerText = "⚠️ Error de conexión con el servidor.";
+      msg.innerText = "⚠️ Error al conectar con el servidor.";
     }
   } catch(e) {
     msg.innerText = "⚠️ Error de red al intentar buscar.";
@@ -338,5 +352,6 @@ Instrucciones:
   esperando = false;
 }
 </script>
+
 </body>
 </html>
