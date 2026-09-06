@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>William's FoodAI 👨‍🍳</title>
+    <title>FoodChefIA 👨‍🍳</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -57,14 +57,14 @@
 <body>
 
     <div class="container">
-        <h1>Chef Virtual AI 🍳</h1>
-        <p>Escribe qué ingredientes tienes en la nevera y William's AI te dirá qué cocinar:</p>
+        <h1>FoodChefIA 🍳</h1>
+        <p>Escribe qué ingredientes tienes en la heladera y FoodChefIA te dirá qué cocinar:</p>
         
         <input type="text" id="ingredientes" placeholder="Ej: huevo, tomate, queso...">
         <br>
         <button onclick="pedirReceta()">¡Generar Receta!</button>
 
-        <div id="respuesta">La IA está esperando tus ingredientes...</div>
+        <div id="respuesta">FoodChefIA está esperando tus ingredientes...</div>
     </div>
 
     <script>
@@ -86,12 +86,11 @@
                 return;
             }
 
-            respuestaDiv.innerText = "🔄 El Chef IA está pensando en tu receta... Por favor espera.";
+            respuestaDiv.innerText = "🔄 FoodChefIA está pensando en tu receta... Por favor espera.";
 
-            const promptCompleto = `Eres un chef experto. El usuario tiene estos ingredientes: ${input}. Sugiere una receta rápida, fácil y deliciosa detallando los pasos.`;
+            const promptCompleto = `Eres FoodChefIA, un chef experto y amigable. El usuario tiene estos ingredientes: ${input}. Preséntate brevemente como FoodChefIA y sugiere una receta rápida, fácil y deliciosa detallando los pasos.`;
 
             try {
-                // Se corrigió la estructura de la URL para la llamada a Pollinations
                 const response = await fetch(`https://text.pollinations.ai/${encodeURIComponent(promptCompleto)}`);
                 
                 if (!response.ok) throw new Error();
@@ -100,10 +99,9 @@
                 respuestaDiv.innerText = data;
 
             } catch (error) {
-                respuestaDiv.innerText = "❌ ¡Ups! El servidor de la IA está saturado o estás sin conexión. Inténtalo de nuevo en unos segundos.";
+                respuestaDiv.innerText = "❌ ¡Ups! El servidor de FoodChefIA está saturado o estás sin conexión. Inténtalo de nuevo en unos segundos.";
             }
         }
     </script>
 </body>
 </html>
-  
