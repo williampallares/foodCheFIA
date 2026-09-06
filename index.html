@@ -1,452 +1,123 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>foodChefIA</title>
-
-<style>
-body{margin:0;font-family:Arial, sans-serif;background:#f4f6f8;transition:0.3s;}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items: center;
-  padding:15px;
-  background:red;
-  color:white;
-  font-weight: bold;
-}
-
-.header button {
-  width: auto !important;
-  margin: 0 !important;
-  padding: 5px 10px !important;
-}
-
-.chat{
-  height:52vh;
-  overflow-y:auto;
-  padding:10px;
-  background:white;
-  border-bottom: 1px solid #ccc;
-}
-
-.msg{margin:6px;padding:12px;border-radius:12px;white-space: pre-wrap; max-width: 85%;}
-.user{background:red;color:white;text-align:right; margin-left: auto;}
-.ia{background:#e0e0e0; color: black; margin-right: auto;}
-
-.banner-promo {
-  background: linear-gradient(135deg, #fff3cd, #ffe8a1);
-  border: 1px solid #ffeba8;
-  padding: 10px 15px;
-  margin: 8px 10px 0 10px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 13px;
-  color: #856404;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-.banner-promo button {
-  background: #ff4747;
-  color: white;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#input, #btnEnviar {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  box-sizing: border-box;
-}
-
-.menu{
-  display:none;
-  position:fixed;
-  top:60px;
-  left:5%;
-  width:90%;
-  background:white;
-  padding:15px;
-  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
-  z-index: 100;
-  border-radius: 8px;
-}
-
-.menu button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  box-sizing: border-box;
-  background: #ff4747;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-#loginModal {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.modal-content {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  width: 85%;
-  max-width: 350px;
-  text-align: center;
-}
-.modal-content input {
-  width: 100%;
-  padding: 12px;
-  margin-top: 15px;
-  margin-bottom: 10px;
-  box-sizing: border-box;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-.modal-content button {
-  width: 100%;
-  padding: 12px;
-  background: red;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: bold;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>William's FoodAI 👨‍🍳</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121214;
+            color: #e1e1e6;
+            text-align: center;
+            padding: 40px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #202024;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        h1 { color: #00b37e; font-size: 28px; }
+        input {
+            width: 80%;
+            padding: 12px;
+            border: 2px solid #29292e;
+            border-radius: 6px;
+            background: #121214;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+        button {
+            background-color: #00b37e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        button:hover { background-color: #00875f; }
+        #respuesta {
+            margin-top: 25px;
+            padding: 15px;
+            background: #29292e;
+            border-radius: 6px;
+            text-align: left;
+            white-space: pre-line;
+            line-height: 1.5;
+        }
+    </style>
 </head>
+<body>
 
-<body onload="iniciarSesion()">
+    <div class="container">
+        <h1>Chef Virtual AI 👨‍🍳</h1>
+        <p>Escribe qué ingredientes tienes en la nevera y William's AI te dirá qué cocinar:</p>
+        
+        <input type="text" id="ingredientes" placeholder="Ej: huevo, tomate, queso...">
+        <br>
+        <button onclick="pedirReceta()">¡Generar Receta!</button>
 
-<div id="loginModal">
-  <div class="modal-content">
-    <h2 style="margin:0; color:red;">🍳 foodChefIA</h2>
-    <p style="margin:5px 0 0 0; color:#555;">¡Ingresá tu nombre para empezar!</p>
-    <input id="nombreUser" placeholder="Tu nombre" onkeydown="evaluarEnterLogin(event)">
-    <button onclick="guardarPerfil()">Entrar a foodChefIA</button>
-  </div>
-</div>
+        <div id="respuesta">La IA está esperando tus ingredientes...</div>
+    </div>
 
-<div class="header">
-<span>🍳 foodChefIA</span>
-<button onclick="toggleMenu()">⚙️</button>
-</div>
+    <script>
+        async function pedirReceta() {
+            const input = document.getElementById('ingredientes').value.trim();
+            const respuestaDiv = document.getElementById('respuesta');
 
-<div id="menu" class="menu">
+            if (!input) {
+                respuestaDiv.innerText = "⚠️ Por favor, escribe algún ingrediente.";
+                return;
+            }
 
-🔊 Voz <input type="checkbox" id="voz"><br><br>
+            respuestaDiv.innerText = "🔄 El Chef IA está pensando en tu receta... Por favor espera.";
 
-🎚 Tono
-<input type="range" id="tono" min="0.5" max="2" step="0.1" value="1"><br><br>
+            // Le damos una estructura rígida para obligarla a responder como receta
+            const promptCompleto = `Actúa como un chef profesional. El usuario tiene únicamente estos ingredientes: ${input}.
+Crea una receta detallada usando este formato obligatorio:
 
-🌗 Brillo
-<input type="range" id="pantalla" min="0" max="100" value="50"><br><br>
+🍳 NOMBRE DE LA RECETA
+⏱️ TIEMPO DE PREPARACIÓN:
 
-<h3>⭐ foodChefIA Premium</h3>
-<div id="opcionesCompra">
-  <button onclick="comprar(1)">1 mes - $5</button>
-  <button onclick="comprar(2)">2 meses - $9</button>
-  <button onclick="comprar(5)">5 meses - $20</button>
-</div>
+🛒 INGREDIENTES NECESARIOS:
+- Ingrediente 1
+- Ingrediente 2
 
-<p id="estadoPremium">❌ Cuenta Gratuita</p>
-<button id="btnDesuscribir" onclick="desuscribirse()" style="display:none; background: #ff4d4d; color: white;">Cancelar Suscripción</button>
+🔥 PASO A PASO:
+1. Primer paso
+2. Segundo paso
 
-<br><br>
-<button id="btnCambiarCuenta" onclick="cambiarPerfil()" style="background: #6c757d;">👤 Cambiar de Cuenta</button>
+💡 CONSEJO DEL CHEF:
+Un tip para que quede mejor.`;
 
-</div>
+            try {
+                // Dirección URL de la API de texto corregida con el signo $ y el modelo estético searchgpt
+                const url = `https://text.pollinations.ai/${encodeURIComponent(promptCompleto)}?model=searchgpt`;
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
 
-<div id="chat" class="chat"></div>
+                const data = await response.text();
+                
+                // Si la respuesta no vino vacía, la mostramos
+                if (data.trim() !== "") {
+                    respuestaDiv.innerText = data;
+                } else {
+                    throw new Error("Respuesta vacía");
+                }
 
-<div id="bannerAnuncio" class="banner-promo">
-  <span id="textoAnuncio">✨ <b>¡Desbloqueá el recetario Michelin completo con tips!</b></span>
-  <button onclick="toggleMenu()">Ver Planes</button>
-</div>
-
-<input id="input" placeholder="Pedí un plato o escribí ingredientes..." onkeydown="evaluarEnterChat(event)">
-<button id="btnEnviar" onclick="enviar()">Buscar en foodChefIA</button>
-
-<script>
-// REGISTRO DE SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('Service Worker listo:', reg.scope))
-      .catch(err => console.error('Error Service Worker:', err));
-  });
-}
-
-const chat = document.getElementById("chat");
-const voz = document.getElementById("voz");
-const tono = document.getElementById("tono");
-const pantalla = document.getElementById("pantalla");
-
-let perfil = null;
-let esperando = false;
-let ultimaReceta = "";
-
-function evaluarEnterLogin(e) { if (e.key === "Enter") guardarPerfil(); }
-function evaluarEnterChat(e) { if (e.key === "Enter") enviar(); }
-
-function iniciarSesion(){
-  let data = localStorage.getItem("perfil");
-  if(data){
-    perfil = JSON.parse(data);
-    document.getElementById("loginModal").style.display="none";
-    if(perfil.esPremium === undefined || !perfil.fechaVencimiento) {
-      perfil.esPremium = false;
-      perfil.fechaVencimiento = null;
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-    }
-    verificarVencimiento();
-    actualizarInterfazPremium();
-    chat.innerHTML = ""; 
-    add("🍳 ¡Hola " + perfil.nombre + "! Bienvenido a foodChefIA. Escribí los ingredientes que tenés o el plato que querés preparar.", "ia");
-  } else {
-    document.getElementById("loginModal").style.display="flex";
-  }
-}
-
-function guardarPerfil(){
-  let nombre = document.getElementById("nombreUser").value.trim();
-  if(!nombre) return alert("Poné tu nombre");
-  perfil = { nombre: nombre, esPremium: false, fechaVencimiento: null };
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-  iniciarSesion();
-}
-
-function cambiarPerfil(){
-  let nuevo = prompt("Nombre del nuevo usuario:");
-  if(nuevo && nuevo.trim() !== ""){
-    perfil = { nombre: nuevo.trim(), esPremium: false, fechaVencimiento: null };
-    localStorage.setItem("perfil", JSON.stringify(perfil));
-    iniciarSesion();
-    toggleMenu();
-  }
-}
-
-function verificarVencimiento(){
-  if(perfil && perfil.esPremium && perfil.fechaVencimiento){
-    if(new Date().getTime() > perfil.fechaVencimiento){
-      perfil.esPremium = false;
-      perfil.fechaVencimiento = null;
-      localStorage.setItem("perfil", JSON.stringify(perfil));
-      alert("⏰ Tu plan Premium ha vencido.");
-    }
-  }
-}
-
-function actualizarInterfazPremium() {
-  const estado = document.getElementById("estadoPremium");
-  const opciones = document.getElementById("opcionesCompra");
-  const btnDesuscribir = document.getElementById("btnDesuscribir");
-  const bannerAnuncio = document.getElementById("bannerAnuncio");
-
-  if(perfil && perfil.esPremium && perfil.fechaVencimiento){
-    let fechaStr = new Date(perfil.fechaVencimiento).toLocaleDateString();
-    estado.innerText = "✅ foodChefIA Premium Activo (Vence: " + fechaStr + ")";
-    opciones.style.display = "none";
-    btnDesuscribir.style.display = "block";
-    bannerAnuncio.style.display = "none"; 
-  } else {
-    estado.innerText = "❌ foodChefIA Gratuito (Limitado)";
-    opciones.style.display = "block";
-    btnDesuscribir.style.display = "none";
-    bannerAnuncio.style.display = "flex"; 
-  }
-}
-
-function comprar(meses){
-  if(!perfil) return;
-  let fechaActual = new Date();
-  fechaActual.setMonth(fechaActual.getMonth() + meses);
-  perfil.esPremium = true;
-  perfil.fechaVencimiento = fechaActual.getTime();
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-  actualizarInterfazPremium();
-  add("⭐ ¡Activaste foodChefIA Premium!", "ia");
-}
-
-function desuscribirse(){
-  if(!perfil) return;
-  perfil.esPremium = false;
-  perfil.fechaVencimiento = null;
-  localStorage.setItem("perfil", JSON.stringify(perfil));
-  actualizarInterfazPremium();
-  add("🛑 Volviste al plan gratuito de foodChefIA.", "ia");
-}
-
-function escribirEfecto(elemento, texto) {
-  let i = 0;
-  elemento.innerText = ""; 
-  function tipeado() {
-    if (i < texto.length) {
-      elemento.innerText += texto.charAt(i);
-      i++;
-      chat.scrollTop = chat.scrollHeight; 
-      setTimeout(tipeado, 12); 
-    } else {
-      mostrarBotonGuardar();
-      hablar(texto);
-      esperando = false; 
-    }
-  }
-  tipeado();
-}
-
-function copiarTextoUniversal(texto) {
-  if (navigator.clipboard && window.isSecureContext) {
-    return navigator.clipboard.writeText(texto);
-  } else {
-    return new Promise((resolve, reject) => {
-      let textArea = document.createElement("textarea");
-      textArea.value = texto;
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        let exito = document.execCommand('copy');
-        document.body.removeChild(textArea);
-        exito ? resolve() : reject();
-      } catch (err) {
-        document.body.removeChild(textArea);
-        reject(err);
-      }
-    });
-  }
-}
-
-function mostrarBotonGuardar(){
-  const btnExistente = document.getElementById("btnCopiarReceta");
-  if(btnExistente) btnExistente.remove();
-
-  let btn = document.createElement("button");
-  btn.id = "btnCopiarReceta";
-  btn.innerText = "📋 Copiar Ficha de foodChefIA";
-  btn.style.background = "#4CAF50";
-  btn.style.color = "white";
-
-  btn.onclick = () => {
-    if(!perfil || !perfil.esPremium) {
-      alert("🔒 Función exclusiva para usuarios foodChefIA Premium ⭐.");
-      return;
-    }
-    copiarTextoUniversal(ultimaReceta)
-      .then(() => alert("✅ ¡Receta copiada!"))
-      .catch(() => alert("❌ No se pudo copiar."));
-  };
-
-  chat.appendChild(btn);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-function toggleMenu(){
-  let m=document.getElementById("menu");
-  m.style.display = m.style.display==="block"?"none":"block";
-}
-
-pantalla.addEventListener("input",()=>{
-  let val = Number(pantalla.value);
-  let bg = 255 - val * 2;
-  document.body.style.background = `rgb(${bg},${bg},${bg})`;
-  chat.style.background = `rgb(${Math.max(bg+20,20)},${Math.max(bg+20,20)},${Math.max(bg+20,20)})`;
-  const header = document.querySelector(".header");
-  header.style.background = val >= 50 ? "#ff8800" : "red";
-});
-
-function add(txt,type){
-  let d=document.createElement("div");
-  d.className="msg "+type;
-  d.innerText=txt;
-  chat.appendChild(d);
-  chat.scrollTop=chat.scrollHeight;
-  return d;
-}
-
-function hablar(txt){
-  if(!voz.checked) return;
-  let s=new SpeechSynthesisUtterance(txt);
-  s.pitch=parseFloat(tono.value);
-  s.lang = "es-ES";
-  speechSynthesis.cancel();
-  speechSynthesis.speak(s);
-}
-
-// ================= FOODCHEFIA PROMPTS =================
-
-async function enviar() {
-  if (esperando) return;
-  verificarVencimiento();
-
-  let inputEl = document.getElementById("input");
-  let txt = inputEl.value.trim();
-  if (!txt) return;
-
-  add(txt, "user");
-  inputEl.value = "";
-
-  esperando = true;
-  let elIA = add(perfil.esPremium ? "⭐ foodChefIA buscando receta Michelin completa..." : "🍳 foodChefIA generando ficha básica...", "ia");
-
-  let promptInstruccion = "";
-
-  if (perfil && perfil.esPremium) {
-    promptInstruccion = "Actúa como foodChefIA en modo Recetario de Alta Cocina Michelin. Para el pedido '" + txt + "', genera la receta en español con este formato exacto:\n\n🍳 [NOMBRE DEL PLATO - foodChefIA Premium]\n⏱️ TIEMPO DE PREPARACIÓN Y PORCIONES:\n🛒 INGREDIENTES:\n- (Lista detallada)\n\n🔥 PREPARACIÓN PASO A PASO:\n1. (Pasos explicados)\n\n💡 SECRETO DEL CHEF:\n🧊 CONSERVACIÓN Y CONSEJO:";
-  } else {
-    promptInstruccion = "Actúa como foodChefIA en modo Gratuito y Limitado. Para '" + txt + "', da SOLO esta ficha súper corta en español:\n\n🍳 [NOMBRE DEL PLATO - foodChefIA Gratuito]\n🛒 INGREDIENTES PRINCIPALES (solo 3 o 4 ítems cortos).\n🔥 PREPARACIÓN RÁPIDA (máximo 2 pasos breves en un solo párrafo).\n\n(No incluyas tiempos, ni porciones, ni secretos de chef, ni tips de conservación. Al final agrega: '🔒 Suscribite a foodChefIA Premium para ver el paso a paso detallado y los secretos del chef').";
-  }
-
-  try {
-    let url = "https://text.pollinations.ai/" + encodeURIComponent(promptInstruccion) + "?model=openai&seed=" + Math.floor(Math.random() * 1000);
-    let res = await fetch(url);
-    if(!res.ok) throw new Error("Error API");
-    
-    let respuestaText = await res.text();
-    ultimaReceta = respuestaText.trim();
-
-  } catch(err) {
-    // LIMPIEZA INTELIGENTE DE TEXTO PARA RESPALDO
-    let ingredienteLimpio = txt
-      .replace(/quiero cocinar|como hacer|preparar|receta de|hacer|quiero/gi, "")
-      .trim();
-
-    if (!ingredienteLimpio) ingredienteLimpio = "tu receta";
-
-    if(perfil.esPremium) {
-      ultimaReceta = `🍳 FOODCHEFIA PREMIUM\n\n⏱️ TIEMPO: 25 min | PORCIONES: 2\n\n🛒 INGREDIENTES:\n- ${ingredienteLimpio}\n- Aceite, sal, pimienta y condimentos a gusto.\n\n🔥 PREPARACIÓN PASO A PASO:\n1. Cortá y dorá la base de ${ingredienteLimpio} en una sartén con un chorrito de aceite a fuego medio.\n2. Sazoná bien, agregá los demás componentes y cociná a fuego lento durante 15 minutos revolviendo despacio hasta que esté a punto.\n\n💡 SECRETO DEL CHEF: Cocinar a fuego lento y tapado preserva la humedad y potencia los sabores.\n🧊 CONSERVACIÓN: Guardar en recipiente hermético en heladera hasta por 48 horas.`;
-    } else {
-      ultimaReceta = `🍳 FOODCHEFIA GRATUITO\n\n🛒 INGREDIENTES PRINCIPALES:\n- ${ingredienteLimpio}\n- Aceite, sal y condimentos básicos.\n\n🔥 PREPARACIÓN RÁPIDA:\nCociná todos los ingredientes en una sartén o olla a fuego medio durante 15 minutos hasta dorar.\n\n🔒 Suscribite a foodChefIA Premium para ver el paso a paso detallado y los secretos del chef.`;
-    }
-  }
-
-  if (perfil.esPremium) {
-    escribirEfecto(elIA, ultimaReceta);
-  } else {
-    elIA.innerText = ultimaReceta;
-    mostrarBotonGuardar();
-    hablar(ultimaReceta);
-    esperando = false;
-  }
-}
-</script>
-
+            } catch (error) {
+                respuestaDiv.innerText = "❌ ¡Ups! Ocurrió un error al conectar con la IA. Inténtalo de nuevo en unos segundos.";
+            }
+        }
+    </script>
 </body>
 </html>
