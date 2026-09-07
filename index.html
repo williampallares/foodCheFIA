@@ -3,338 +3,555 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>foodChefIA - Recetario Global</title>
+<title>foodChefIA</title>
 
 <style>
-:root {
-  --bg-color: #f4f6f8;
-  --header-bg: red;
-  --chat-bg: #e0e0e0;
-  --msg-user: red;
-  --msg-ia-bg: #e0e0e0;
-  --msg-ia-text: #111;
-  --input-bg: #ffffff;
-  --input-text: #000000;
-  --menu-bg: #ffffff;
-  --menu-text: #333333;
+:root{
+  --bg:#f4f6f8;
+  --card:#ffffff;
+  --text:#222222;
+  --primary:#d60000;
+  --secondary:#eaeaea;
+  --accent:#007bff;
 }
 
-body.dark-mode {
-  --bg-color: #121212;
-  --chat-bg: #1e1e1e;
-  --msg-ia-bg: #2a2a2a;
-  --msg-ia-text: #ffffff;
-  --input-bg: #1e1e1e;
-  --input-text: #ffffff;
-  --menu-bg: #252525;
-  --menu-text: #ffffff;
+body.dark{
+  --bg:#121212;
+  --card:#1e1e1e;
+  --text:#ffffff;
+  --secondary:#2a2a2a;
+  --primary:#ff8c00;
+  --accent:#ffd700;
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: var(--bg-color);
-  color: var(--input-text);
+body{
+  margin:0;
+  font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background:var(--bg);
+  color:var(--text);
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  transition: 0.3s;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 12px 18px;
-  background: var(--header-bg);
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
+  min-height: 100vh;
 }
 
-.header button {
-  background: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items: center;
+  padding:15px;
+  font-weight:bold;
+  font-size: 1.2rem;
+  border-bottom: 1px solid var(--secondary);
 }
 
-.chat-container {
-  flex: 1;
+.header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.toggle{
+  background:#222;
+  color:white;
+  padding:6px 12px;
+  border-radius:10px;
+  cursor:pointer;
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+.container{
+  width:100%;
+  max-width:520px;
+  background: var(--card);
+  padding:15px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.chat{
+  height:320px;
+  overflow-y:auto;
+  background:var(--secondary);
+  border-radius:14px;
+  padding:12px;
   display: flex;
   flex-direction: column;
-  padding: 15px;
+  gap: 10px;
 }
 
-.chat {
-  height: 60vh;
-  overflow-y: auto;
-  padding: 15px;
-  background: var(--chat-bg);
-  border-radius: 12px;
-}
-
-.msg {
-  margin: 6px;
-  padding: 12px;
-  border-radius: 12px;
-  white-space: pre-wrap;
-  font-size: 15px;
+.msg{
+  padding:12px 16px;
+  border-radius:14px;
+  max-width:85%;
   line-height: 1.4;
+  font-size: 0.95rem;
 }
 
-.user {
-  background: var(--msg-user);
-  color: white;
-  text-align: right;
+.user{
+  background:var(--primary);
+  color:white;
+  align-self: flex-end;
+  border-bottom-right-radius: 2px;
 }
 
-.ia {
-  background: var(--msg-ia-bg);
-  color: var(--msg-ia-text);
+.ia{
+  background:var(--card);
+  color:var(--text);
+  align-self: flex-start;
+  border-bottom-left-radius: 2px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
-.input-zone {
-  padding: 10px 15px;
-  background: var(--input-bg);
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 12px;
+input, select{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:10px;
+  border:1px solid #ccc;
   box-sizing: border-box;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  font-size: 15px;
-  background: var(--input-bg);
-  color: var(--input-text);
+  font-size: 0.95rem;
+  outline: none;
+  background: var(--card);
+  color: var(--text);
 }
 
-button.btn-buscar {
+button{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:var(--primary);
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
   width: 100%;
-  padding: 12px;
-  margin-top: 8px;
-  box-sizing: border-box;
-  background: #e0e0e0;
-  border: 1px solid #ccc;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+button:disabled{
+  opacity:0.5;
+}
+
+.fav-box{
+  margin-top:15px;
+  background:var(--secondary);
+  padding:12px;
+  border-radius:10px;
+}
+
+.fav-item{
+  margin-top:8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card);
+  padding: 8px 12px;
   border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
 }
 
-.btn-copiar {
-  background: #4CAF50;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 10px;
-  display: inline-block;
+.fav-item button{
+  margin-left:5px;
+  padding:4px 8px;
+  font-size:12px;
+  width: auto;
+  margin-top: 0;
 }
 
-.menu {
+.settings-menu {
   display: none;
-  position: fixed;
+  position: absolute;
   top: 60px;
   right: 15px;
-  width: 270px;
-  background: var(--menu-bg);
-  color: var(--menu-text);
+  width: 260px;
+  background: var(--card);
+  border: 1px solid var(--secondary);
+  border-radius: 12px;
   padding: 15px;
-  box-shadow: 0px 4px 12px rgba(0,0,0,0.3);
-  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   z-index: 100;
 }
 
-.menu h3 {
-  margin-top: 0;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 5px;
-}
-
-.opcion-ajuste {
-  margin-bottom: 12px;
-  text-align: left;
-}
-
-.opcion-ajuste label {
+.settings-menu.open {
   display: block;
-  font-size: 14px;
-  margin-bottom: 4px;
-  font-weight: bold;
 }
 
-.opcion-ajuste input[type="range"], 
-.opcion-ajuste select {
-  width: 100%;
+.setting-option {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.setting-option label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.setting-option input[type="range"] {
+  padding: 0;
+  margin-top: 5px;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  font-size: 0.85rem;
+  padding: 8px;
 }
 </style>
 </head>
-
 <body>
 
-<div class="header">
-  <span>🔍 foodChefIA - Recetario Global</span>
-  <button onclick="toggleMenu()">⚙️</button>
-</div>
-
-<!-- Menú de Ajustes -->
-<div id="menu" class="menu">
-  <h3>⚙️ Ajustes</h3>
-  
-  <div class="opcion-ajuste">
-    <label>
-      <input type="checkbox" id="checkOscuro" onchange="cambiarModoOscuro()"> 🌙 Modo Oscuro
-    </label>
+<div class="container">
+  <div class="header">
+    <span>🍳 foodChefIA</span>
+    <div class="header-actions">
+      <div class="toggle" onclick="toggleSettings()">⚙️</div>
+      <div class="toggle" onclick="toggleDark()">🌙</div>
+    </div>
   </div>
 
-  <div class="opcion-ajuste">
-    <label>🔊 Volumen de Voz</label>
-    <input type="range" id="volumenVoz" min="0" max="1" step="0.1" value="1">
+  <div id="settingsMenu" class="settings-menu">
+    <div class="setting-option">
+      <label>
+        <b>🔊 Lectura por voz</b>
+        <input type="checkbox" id="voz">
+      </label>
+    </div>
+    
+    <div class="setting-option">
+      <label><b>🎚 Tono de voz</b></label>
+      <input type="range" id="tono" min="0.5" max="2" step="0.1" value="1">
+    </div>
+
+    <button class="btn-secondary" onclick="vaciarFavs()">🗑️ Borrar todos los favoritos</button>
   </div>
 
-  <div class="opcion-ajuste">
-    <label>🗣️ Lectura de Receta (Voz)</label>
-    <select id="selectVoz">
-      <option value="es-ES">Español</option>
-    </select>
+  <div id="chat" class="chat">
+    <div class="msg ia">¡Hola! Escribí qué querés cocinar (pizza, lasaña, empanadas, brownie...) y te paso la receta exacta.</div>
   </div>
 
-  <div class="opcion-ajuste">
-    <label>🔤 Tamaño de Texto</label>
-    <select onchange="cambiarTamanoTexto(this.value)">
-      <option value="14px">Pequeño</option>
-      <option value="15px" selected>Normal</option>
-      <option value="18px">Grande</option>
-    </select>
+  <input id="input" placeholder="Ej: pizza italiana, milanesas, brownies, tacos..." onkeydown="if(event.key==='Enter') enviar()">
+
+  <select id="idioma">
+    <option value="es">Español</option>
+    <option value="en">English</option>
+    <option value="pt">Português</option>
+    <option value="fr">Français</option>
+    <option value="it">Italiano</option>
+  </select>
+
+  <button id="btn" onclick="enviar()">Generar receta</button>
+
+  <div class="fav-box">
+    <b>⭐ Recetas Favoritas</b>
+    <div id="fav"></div>
   </div>
-
-  <button onclick="toggleMenu()" style="width:100%; padding: 8px; background: red; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Cerrar</button>
-</div>
-
-<div class="chat-container">
-  <div id="chat" class="chat"></div>
-</div>
-
-<div id="zonaBotonCopiar" style="padding: 0 15px;"></div>
-
-<div class="input-zone">
-  <input id="input" type="text" placeholder="Pedí un ingrediente, un país o un estilo de comida..." onkeypress="if(event.key === 'Enter') enviar()">
-  <button class="btn-buscar" onclick="enviar()">Buscar en foodChefIA</button>
 </div>
 
 <script>
-const chat = document.getElementById("chat");
-let esperando = false;
-let ultimaRespuesta = "";
-
-function toggleMenu(){
-  let m = document.getElementById("menu");
-  m.style.display = (m.style.display === "block") ? "none" : "block";
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('SW activo:', reg.scope))
+      .catch(err => console.error('Error SW:', err));
+  });
 }
 
-function cambiarModoOscuro(){
-  document.body.classList.toggle("dark-mode");
+const chat=document.getElementById("chat");
+const input=document.getElementById("input");
+const idioma=document.getElementById("idioma");
+const btn=document.getElementById("btn");
+const favBox=document.getElementById("fav");
+const settingsMenu=document.getElementById("settingsMenu");
+const voz=document.getElementById("voz");
+const tono=document.getElementById("tono");
+
+function toggleDark(){
+  document.body.classList.toggle("dark");
 }
 
-function cambiarTamanoTexto(val){
-  const mensajes = document.querySelectorAll('.msg');
-  mensajes.forEach(m => m.style.fontSize = val);
+function toggleSettings(){
+  settingsMenu.classList.toggle("open");
 }
 
-function add(txt, type){
-  let d = document.createElement("div");
-  d.className = "msg " + type;
-  d.innerText = txt;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-  return d;
+let favs=JSON.parse(localStorage.getItem("favs"))||[];
+
+function guardarFav(t){
+  if(!favs.includes(t)){
+    favs.push(t);
+    localStorage.setItem("favs",JSON.stringify(favs));
+    pintarFav();
+  }
 }
 
-function mostrarBotonCopiar(){
-  const contenedor = document.getElementById("zonaBotonCopiar");
-  contenedor.innerHTML = "";
+function borrarFav(texto){
+  favs=favs.filter(f=>f!==texto);
+  localStorage.setItem("favs",JSON.stringify(favs));
+  pintarFav();
+}
 
-  let btn = document.createElement("button");
-  btn.className = "btn-copiar";
-  btn.innerText = "📋 Copiar Fichas de foodChefIA";
+function vaciarFavs(){
+  if(confirm("¿Seguro que querés borrar todos los favoritos?")){
+    favs=[];
+    localStorage.removeItem("favs");
+    pintarFav();
+  }
+}
 
-  btn.onclick = async () => {
-    try {
-      await navigator.clipboard.writeText(ultimaRespuesta);
-      alert("✅ ¡Fichas copiadas al portapapeles!");
-    } catch (err) {
-      alert("❌ No se pudo copiar.");
-    }
+function pintarFav(){
+  favBox.innerHTML="";
+  if(favs.length === 0){
+    favBox.innerHTML = "<small style='color:gray;'>No hay favoritas guardadas</small>";
+    return;
+  }
+  favs.forEach(f=>{
+    const d=document.createElement("div");
+    d.className="fav-item";
+    d.innerHTML=`
+    <span>⭐ ${f}</span>
+    <div>
+      <button onclick="borrarFav('${f}')">🗑</button>
+    </div>
+    `;
+    favBox.appendChild(d);
+  });
+}
+pintarFav();
+
+function hablar(texto, lang) {
+  if (!voz.checked) return;
+  
+  let textoLimpio = texto.replace(/<[^>]*>?/gm, '');
+  textoLimpio = textoLimpio.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F6D0}-\u{1F6FF}\u{1F004}\u{1F0CF}\u{1F170}-\u{1F251}]/gu, '');
+
+  const mapaIdiomas = {
+    'es': 'es-ES',
+    'en': 'en-US',
+    'pt': 'pt-BR',
+    'fr': 'fr-FR',
+    'it': 'it-IT'
   };
 
-  contenedor.appendChild(btn);
+  const s = new SpeechSynthesisUtterance(textoLimpio);
+  s.pitch = parseFloat(tono.value);
+  s.lang = mapaIdiomas[lang] || 'es-ES';
+  speechSynthesis.cancel();
+  speechSynthesis.speak(s);
 }
 
-// Base de datos local garantizada que no falla por red o CORS
-const baseRecetas = {
-  pizza: `🔍 OPCIÓN 1: PIZZA MARGHERITA - ITALIA
-
-⏱️ TIEMPO: 30 min | PORCIONES: 2
-
-🛒 INGREDIENTES:
-- 250g de harina 000
-- 150ml de agua tibia
-- 5g de levadura fresca
-- 100g de salsa de tomate natural
-- 150g de queso mozzarella fresco
-- Hojas de albahaca fresca y aceite de oliva
-
-🔥 PREPARACIÓN PASO A PASO:
-1. Disolver la levadura en agua tibia, mezclar con la harina y amasar durante 10 minutos. Dejar leudar.
-2. Estirar la masa en forma circular, colocar la salsa de tomate de forma uniforme.
-3. Hornear a máxima temperatura (250°C) durante 8-10 minutos.
-4. Agregar la mozzarella fresca y hornear 2 minutos más. Finalizar con albahaca y un hilo de aceite de oliva.
-
-💡 SECRETO DEL CHEF: Cocinar sobre una piedra para pizza muy caliente logra los bordes aireados y crocantes al estilo napolitano.
-🧊 CONSERVACIÓN: Guardar en heladera hasta por 2 días. Reagarrar textura en sartén tapada a fuego medio.`,
-
-  defecto: `🔍 OPCIÓN 1: PLATILLO RECOMENDADO - GASTRONOMÍA INTERNACIONAL
-
-⏱️ TIEMPO: 25 min | PORCIONES: 2
-
-🛒 INGREDIENTES:
-- Ingredientes principales frescos
-- Condimentos a gusto
-- Aceite de oliva o vegetal
-
-🔥 PREPARACIÓN PASO A PASO:
-1. Saltear los ingredientes principales a fuego medio-alto.
-2. Condimentar e integrar las salsas correspondientes.
-3. Servir caliente de inmediato.
-
-💡 SECRETO DEL CHEF: Usar siempre ingredientes frescos y controlar la temperatura de cocción.
-🧊 CONSERVACIÓN: Guardar en contenedor hermético.`
+// DICCIONARIO ANTI-SPANGLISH (Traductor inteligente)
+const diccionarioGastronomico = {
+  "breadfruit": "fruta del pan",
+  "water": "agua",
+  "oil": "aceite",
+  "lettuce": "lechuga",
+  "codfish": "bacalao",
+  "salt": "sal",
+  "pepper": "pimienta",
+  "onion": "cebolla",
+  "garlic": "ajo",
+  "flour": "harina",
+  "sugar": "azúcar",
+  "butter": "manteca",
+  "milk": "leche",
+  "egg": "huevo",
+  "eggs": "huevos",
+  "chicken": "pollo",
+  "beef": "carne de res",
+  "pork": "cerdo",
+  "cheese": "queso",
+  "tomato": "tomate",
+  "as required": "cantidad necesaria",
+  "to taste": "a gusto",
+  "for frying": "para freír",
+  "slice": "cortar en rodajas",
+  "fry": "freír",
+  "boil": "hervir",
+  "bake": "hornear"
 };
 
+function traducirSpanglish(texto) {
+  let resultado = texto;
+  Object.keys(diccionarioGastronomico).forEach(clave => {
+    const regex = new RegExp("\\b" + clave + "\\b", "gi");
+    resultado = resultado.replace(regex, diccionarioGastronomico[clave]);
+  });
+  return resultado;
+}
+
+// RECETARIO EXACTO PARA PLATOS POPULARES
+const recetasEspecificas = {
+  "pizza": `<b>🍳 PIZZA ITALIANA TRADICIONAL</b><br><br>
+<b>⏱️ Tiempo:</b> 45 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes exactos:</b><br>
+- 250g de harina 000 (o común)<br>
+- 150ml de agua tibia<br>
+- 5g de levadura seca<br>
+- 1 cucharada de aceite de oliva<br>
+- 1/2 cucharadita de sal<br>
+- 100g de salsa de tomate<br>
+- 150g de queso mozzarella<br>
+- Orégano a gusto<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. En un bowl, disolvé la levadura en el agua tibia y dejá reposar 5 minutos.<br>
+2. Agregá la harina, la sal y el aceite. Mezclá y amasá durante 8 minutos hasta tener un bollo suave.<br>
+3. Tapá el bollo y dejalo leudar 30 minutos.<br>
+4. Estirá la masa sobre una asadera aceitada.<br>
+5. Cubrí con la salsa de tomate y el queso mozzarella.<br>
+6. Horneá a fuego máximo (220°C - 250°C) por 12 a 15 minutos hasta dorar la base.`,
+
+  "papas fritas": `<b>🍳 PAPAS FRITAS CROCANTES</b><br><br>
+<b>⏱️ Tiempo:</b> 25 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes exactos:</b><br>
+- 3 papas medianas<br>
+- 1/2 litro de aceite para freír<br>
+- Sal fina a gusto<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. Pelá y cortá las papas en bastones de 1 cm.<br>
+2. Secá las papas muy bien con papel absorbente.<br>
+3. Calentá el aceite en una sartén profunda a fuego medio-alto.<br>
+4. Cociná las papas durante 8-10 minutos hasta que estén doradas.<br>
+5. Retirá con espumadera, escurrí en papel de cocina y agregá sal de inmediato.`,
+
+  "hamburguesa": `<b>🍳 HAMBURGUESA CASERA JUGOSA</b><br><br>
+<b>⏱️ Tiempo:</b> 15 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes exactos:</b><br>
+- 200g de carne picada<br>
+- 1 pan de hamburguesa<br>
+- 1 feta de queso cheddar<br>
+- Sal y pimienta a gusto<br>
+- 1 cucharada de aceite<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. Formá un bollo con la carne y aplastalo hasta darle forma de disco de 1.5 cm de grosor.<br>
+2. Calentá una sartén a fuego alto con un chorrito de aceite.<br>
+3. Colocá la carne, condimentá con sal y pimienta. Cociná 3 minutos.<br>
+4. Dala vuelta, agregá el queso encima y cociná 3 minutos más.<br>
+5. Tostá el pan en la misma sartén y armá tu hamburguesa.`
+};
+
+// BUSCADOR CON FILTRO LÓGICO Y TRADUCCIÓN
+async function obtenerReceta(consulta) {
+  const clave = consulta.toLowerCase().trim();
+
+  // 1. Recetas locales exactas
+  for (let k in recetasEspecificas) {
+    if (clave.includes(k)) {
+      return recetasEspecificas[k];
+    }
+  }
+
+  // 2. Búsqueda en API gastronómica libre (TheMealDB)
+  try {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(clave)}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data.meals && data.meals.length > 0) {
+        const plato = data.meals[0];
+        
+        let ingredientesHTML = "";
+        for (let i = 1; i <= 15; i++) {
+          const ing = plato[`strIngredient${i}`];
+          const cant = plato[`strMeasure${i}`];
+          if (ing && ing.trim() !== "") {
+            ingredientesHTML += `- ${traducirSpanglish(ing)} (${cant ? traducirSpanglish(cant.trim()) : 'a gusto'})<br>`;
+          }
+        }
+
+        let instrucciones = traducirSpanglish(plato.strInstructions);
+
+        return `<b>🍳 ${traducirSpanglish(plato.strMeal).toUpperCase()}</b><br><br>
+<b>⏱️ Tiempo:</b> 30 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes exactos:</b><br>
+${ingredientesHTML}<br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+${instrucciones.replace(/\r\n|\r|\n/g, "<br>")}`;
+      }
+    }
+  } catch (e) {
+    console.log("Fallback a generador lógico");
+  }
+
+  // 3. Fallback inteligente por estructura gastronómica
+  const esMasa = clave.includes("pizza") || clave.includes("pan") || clave.includes("tarta") || clave.includes("empanada");
+  const esDulce = clave.includes("torta") || clave.includes("brownie") || clave.includes("galleta") || clave.includes("bizcocho");
+
+  if (esMasa) {
+    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()} CASERA</b><br><br>
+<b>⏱️ Tiempo:</b> 40 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes para la base:</b><br>
+- 300g de harina común<br>
+- 150ml de agua tibia<br>
+- 1 cucharada de aceite<br>
+- 1 pizca de sal<br>
+- Relleno o cobertura a elección<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. En un bowl, mezclá la harina, la sal, el aceite y el agua tibia.<br>
+2. Amasá durante 7 minutos hasta tener una masa uniforme.<br>
+3. Dejá reposar la masa tapada durante 15 minutos.<br>
+4. Estirá sobre una fuente aceitada y agregá los ingredientes por encima.<br>
+5. Llevá a horno precalentado a 200°C por 15-20 minutos.`;
+  }
+
+  if (esDulce) {
+    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()} DULCE</b><br><br>
+<b>⏱️ Tiempo:</b> 35 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes exactos:</b><br>
+- 200g de harina leudante<br>
+- 100g de azúcar<br>
+- 2 huevos<br>
+- 50g de manteca derretida<br>
+- 1 cucharadita de esencia de vainilla<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. Batí los huevos con el azúcar en un bowl.<br>
+2. Integrá la manteca derretida y la vainilla.<br>
+3. Agregá la harina tamizada de a poco mezclando con espátula.<br>
+4. Verté en un molde enharinado y horneá a 180°C por 25 minutos.`;
+  }
+
+  return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()}</b><br><br>
+<b>⏱️ Tiempo:</b> 25 min | <b>Dificultad:</b> Fácil<br><br>
+<b>🛒 Ingredientes principales:</b><br>
+- Ración principal para ${clave}<br>
+- 1 cebolla y verduras a elección<br>
+- Sal, pimienta y condimentos a gusto<br>
+- 2 cucharadas de aceite<br><br>
+<b>🔥 Paso a Paso para principiantes:</b><br>
+1. Picá las verduras en cubos pequeños.<br>
+2. Saltéalas en una sartén con aceite a fuego medio por 5 minutos.<br>
+3. Agregá la proteína o ingrediente principal y condimentá.<br>
+4. Cociná revolviendo a fuego medio por 12-15 minutos hasta completar la cocción.`;
+}
+
 async function enviar(){
-  if(esperando) return;
+  const t = input.value.trim();
+  if(!t) return;
 
-  let txt = document.getElementById("input").value.trim();
-  if(!txt) return;
+  btn.disabled = true;
+  chat.innerHTML += `<div class="msg user">${t}</div>`;
 
-  esperando = true;
-  add(txt, "user");
-  let msg = add("🌍 Buscando recetas en el recetario...", "ia");
-  document.getElementById("input").value = ""; 
+  const ia = document.createElement("div");
+  ia.className = "msg ia";
+  ia.innerHTML = "🔍 Preparando la receta paso a paso...";
+  chat.appendChild(ia);
+  chat.scrollTop = chat.scrollHeight;
 
-  setTimeout(() => {
-    let respuesta = txt.toLowerCase().includes("pizza") ? baseRecetas.pizza : baseRecetas.defecto;
-    msg.innerText = respuesta;
-    ultimaRespuesta = respuesta;
-    mostrarBotonCopiar();
-    esperando = false;
-  }, 600);
+  let resultado = await obtenerReceta(t);
+
+  ia.innerHTML = resultado;
+
+  const b = document.createElement("button");
+  b.style.width = "auto";
+  b.style.marginTop = "8px";
+  b.innerText = "⭐ Guardar";
+  b.onclick = () => guardarFav(t);
+  ia.appendChild(b);
+
+  hablar(resultado, idioma.value);
+
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
+  btn.disabled = false;
 }
 </script>
 
