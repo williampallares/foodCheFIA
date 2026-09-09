@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- META TAGS ANTI-CACHÉ -->
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
 <title>foodChefIA</title>
 
 <style>
@@ -250,13 +256,19 @@ button:disabled{
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('SW activo:', reg.scope))
-      .catch(err => console.error('Error SW:', err));
-  });
-}
+// BORRADO AUTOMÁTICO DE CACHÉ
+(function purgarCache() {
+  if ('caches' in window) {
+    caches.keys().then(names => {
+      names.forEach(name => caches.delete(name));
+    });
+  }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(registrations => {
+      registrations.forEach(registration => registration.unregister());
+    });
+  }
+})();
 
 const chat=document.getElementById("chat");
 const input=document.getElementById("input");
@@ -340,7 +352,7 @@ function hablar(texto, lang) {
   speechSynthesis.speak(s);
 }
 
-// DICCIONARIO ANTI-SPANGLISH (Traductor inteligente)
+// DICCIONARIO ANTI-SPANGLISH
 const diccionarioGastronomico = {
   "breadfruit": "fruta del pan",
   "water": "agua",
@@ -430,18 +442,26 @@ const recetasEspecificas = {
 5. Tostá el pan en la misma sartén y armá tu hamburguesa.`
 };
 
-// BUSCADOR CON FILTRO LÓGICO Y TRADUCCIÓN
+// BUSCADOR CORREGIDO SIN RECETAS ABSURDAS
 async function obtenerReceta(consulta) {
   const clave = consulta.toLowerCase().trim();
 
-  // 1. Recetas locales exactas
+  // 1. Filtro de seguridad (evita ingredientes no comestibles / absurdos)
+  const palabrasProhibidas = ["uranio", "gema", "gemas", "infinito", "bobicraft", "plastico", "vidrio", "piedra", "veneno"];
+  const contieneProhibido = palabrasProhibidas.some(palabra => clave.includes(palabra));
+
+  if (contieneProhibido) {
+    return `⚠️ <b>Error de cocina:</b> "${clave}" no es un ingrediente comestible. ¡Probá buscando una receta de verdad!`;
+  }
+
+  // 2. Recetas locales exactas
   for (let k in recetasEspecificas) {
     if (clave.includes(k)) {
       return recetasEspecificas[k];
     }
   }
 
-  // 2. Búsqueda en API gastronómica libre (TheMealDB)
+  // 3. Búsqueda en API gastronómica libre (TheMealDB)
   try {
     const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(clave)}`);
     if (res.ok) {
@@ -472,9 +492,10 @@ ${instrucciones.replace(/\r\n|\r|\n/g, "<br>")}`;
     console.log("Fallback a generador lógico");
   }
 
-  // 3. Fallback inteligente por estructura gastronómica
+  // 4. Fallback por estructura gastronómica segura
   const esMasa = clave.includes("pizza") || clave.includes("pan") || clave.includes("tarta") || clave.includes("empanada");
   const esDulce = clave.includes("torta") || clave.includes("brownie") || clave.includes("galleta") || clave.includes("bizcocho");
+  const esSalado = clave.includes("carne") || clave.includes("pollo") || clave.includes("sopa") || clave.includes("guiso") || clave.includes("arroz") || clave.includes("fideos") || clave.includes("ensalada");
 
   if (esMasa) {
     return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()} CASERA</b><br><br>
@@ -509,7 +530,8 @@ ${instrucciones.replace(/\r\n|\r|\n/g, "<br>")}`;
 4. Verté en un molde enharinado y horneá a 180°C por 25 minutos.`;
   }
 
-  return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()}</b><br><br>
+  if (esSalado) {
+    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()}</b><br><br>
 <b>⏱️ Tiempo:</b> 25 min | <b>Dificultad:</b> Fácil<br><br>
 <b>🛒 Ingredientes principales:</b><br>
 - Ración principal para ${clave}<br>
@@ -521,6 +543,10 @@ ${instrucciones.replace(/\r\n|\r|\n/g, "<br>")}`;
 2. Saltéalas en una sartén con aceite a fuego medio por 5 minutos.<br>
 3. Agregá la proteína o ingrediente principal y condimentá.<br>
 4. Cociná revolviendo a fuego medio por 12-15 minutos hasta completar la cocción.`;
+  }
+
+  // 5. Mensaje si la búsqueda no coincide con ninguna comida válida
+  return `❌ <b>No encontré la receta para "${clave}".</b><br><br>Intentá buscando platos de comida reales como <i>lasaña, tacos, brownie, empanadas</i> o <i>guiso</i>.`;
 }
 
 async function enviar(){
