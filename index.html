@@ -204,6 +204,13 @@ button:disabled{
   font-size: 0.85rem;
   padding: 8px;
 }
+
+.disclaimer {
+  text-align: center;
+  font-size: 11px;
+  color: #888;
+  margin-top: 10px;
+}
 </style>
 </head>
 <body>
@@ -220,26 +227,26 @@ button:disabled{
   <div id="settingsMenu" class="settings-menu">
     <div class="setting-option">
       <label>
-        <b>🔊 Lectura por voz</b>
+        <b id="lblVoz">🔊 Lectura por voz</b>
         <input type="checkbox" id="voz">
       </label>
     </div>
     
     <div class="setting-option">
-      <label><b>🎚 Tono de voz</b></label>
+      <label><b id="lblTono">🎚 Tono de voz</b></label>
       <input type="range" id="tono" min="0.5" max="2" step="0.1" value="1">
     </div>
 
-    <button class="btn-secondary" onclick="vaciarFavs()">🗑️ Borrar todos los favoritos</button>
+    <button class="btn-secondary" id="btnBorrarFavs" onclick="vaciarFavs()">🗑️ Borrar todos los favoritos</button>
   </div>
 
   <div id="chat" class="chat">
-    <div class="msg ia">¡Hola! Escribí qué querés cocinar (pizza, lasaña, empanadas, brownie...) y te paso la receta exacta.</div>
+    <div class="msg ia" id="welcomeMsg">¡Hola! Decime qué tenés en la heladera o qué plato querés preparar y te armo la receta.</div>
   </div>
 
-  <input id="input" placeholder="Ej: pizza italiana, milanesas, brownies, tacos..." onkeydown="if(event.key==='Enter') enviar()">
+  <input id="input" placeholder="Ej: pizza, milanesas, algo con arroz y huevo..." onkeydown="if(event.key==='Enter') enviar()">
 
-  <select id="idioma">
+  <select id="idioma" onchange="cambiarIdiomaInterfaz()">
     <option value="es">Español</option>
     <option value="en">English</option>
     <option value="pt">Português</option>
@@ -249,27 +256,15 @@ button:disabled{
 
   <button id="btn" onclick="enviar()">Generar receta</button>
 
+  <p class="disclaimer" id="disclaimerTxt">⚠️ La IA puede cometer errores. Verifica siempre temperaturas y alérgenos.</p>
+
   <div class="fav-box">
-    <b>⭐ Recetas Favoritas</b>
+    <b id="lblFavs">⭐ Recetas Favoritas</b>
     <div id="fav"></div>
   </div>
 </div>
 
 <script>
-// BORRADO AUTOMÁTICO DE CACHÉ
-(function purgarCache() {
-  if ('caches' in window) {
-    caches.keys().then(names => {
-      names.forEach(name => caches.delete(name));
-    });
-  }
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.getRegistrations().then(registrations => {
-      registrations.forEach(registration => registration.unregister());
-    });
-  }
-})();
-
 const chat=document.getElementById("chat");
 const input=document.getElementById("input");
 const idioma=document.getElementById("idioma");
@@ -278,6 +273,110 @@ const favBox=document.getElementById("fav");
 const settingsMenu=document.getElementById("settingsMenu");
 const voz=document.getElementById("voz");
 const tono=document.getElementById("tono");
+
+// TRADUCCIONES DE LA INTERFAZ
+const traduccionesUI = {
+  es: {
+    welcome: "¡Hola! Decime qué tenés en la heladera o qué plato querés preparar y te armo la receta.",
+    placeholder: "Ej: pizza, milanesas, algo con arroz y huevo...",
+    btnGenerar: "Generar receta",
+    disclaimer: "⚠️ La IA puede cometer errores. Verifica siempre temperaturas y alérgenos.",
+    favTitle: "⭐ Recetas Favoritas",
+    noFavs: "No hay favoritas guardadas",
+    lblVoz: "🔊 Lectura por voz",
+    lblTono: "🎚 Tono de voz",
+    btnBorrarFavs: "🗑️ Borrar todos los favoritos",
+    btnGuardarFav: "⭐ Guardar en Favoritos",
+    confirmBorrar: "¿Seguro que querés borrar todos los favoritos?",
+    thinking: "🍳 El chef está pensando la receta...",
+    errorInedible: "⚠️ Error: No es un ingrediente comestible.",
+    nombreIdiomaIA: "Spanish"
+  },
+  en: {
+    welcome: "Hello! Tell me what you have in the fridge or what dish you want to make, and I'll create the recipe.",
+    placeholder: "Ex: pizza, chicken cutlet, something with rice and eggs...",
+    btnGenerar: "Generate recipe",
+    disclaimer: "⚠️ AI can make mistakes. Always check cooking temperatures and allergens.",
+    favTitle: "⭐ Favorite Recipes",
+    noFavs: "No saved favorites",
+    lblVoz: "🔊 Voice reading",
+    lblTono: "🎚 Voice pitch",
+    btnBorrarFavs: "🗑️ Delete all favorites",
+    btnGuardarFav: "⭐ Save to Favorites",
+    confirmBorrar: "Are you sure you want to delete all favorites?",
+    thinking: "🍳 The chef is thinking about the recipe...",
+    errorInedible: "⚠️ Error: Not an edible ingredient.",
+    nombreIdiomaIA: "English"
+  },
+  pt: {
+    welcome: "Olá! Diga-me o que você tem na geladeira ou qual prato quer preparar e eu criarei a receita.",
+    placeholder: "Ex: pizza, bife empanado, algo com arroz e ovo...",
+    btnGenerar: "Gerar receita",
+    disclaimer: "⚠️ A IA pode cometer erros. Sempre verifique temperaturas e alérgenos.",
+    favTitle: "⭐ Receitas Favoritas",
+    noFavs: "Nenhuma receita salva",
+    lblVoz: "🔊 Leitura de voz",
+    lblTono: "🎚 Tom de voz",
+    btnBorrarFavs: "🗑️ Excluir todos os favoritos",
+    btnGuardarFav: "⭐ Salvar nos Favoritos",
+    confirmBorrar: "Tem certeza de que deseja excluir todos os favoritos?",
+    thinking: "🍳 O chef está pensando na receita...",
+    errorInedible: "⚠️ Erro: Não é um ingrediente comestível.",
+    nombreIdiomaIA: "Portuguese"
+  },
+  fr: {
+    welcome: "Bonjour! Dites-moi ce que vous avez dans le frigo ou quel plat vous voulez cuisiner et je vous ferai la recette.",
+    placeholder: "Ex: pizza, escalope, quelque chose avec du riz et des œufs...",
+    btnGenerar: "Générer la recette",
+    disclaimer: "⚠️ L'IA peut commettre des erreurs. Vérifiez toujours les températures et les allergènes.",
+    favTitle: "⭐ Recettes Préférées",
+    noFavs: "Aucun favori enregistré",
+    lblVoz: "🔊 Lecture vocale",
+    lblTono: "🎚 Tonalité de la voix",
+    btnBorrarFavs: "🗑️ Supprimer tous les favoris",
+    btnGuardarFav: "⭐ Enregistrer dans les Favoris",
+    confirmBorrar: "Êtes-vous sûr de vouloir supprimer tous les favoris?",
+    thinking: "🍳 Le chef réfléchit à la recette...",
+    errorInedible: "⚠️ Erreur: Ce n'est pas un ingrédient comestible.",
+    nombreIdiomaIA: "French"
+  },
+  it: {
+    welcome: "Ciao! Dimmi cosa hai in frigorifero o quale piatto vuoi preparare e ti creo la ricetta.",
+    placeholder: "Es: pizza, cotoletta, qualcosa con riso e uova...",
+    btnGenerar: "Genera ricetta",
+    disclaimer: "⚠️ L'IA può commettere errori. Verifica sempre temperature e allergeni.",
+    favTitle: "⭐ Ricette Preferite",
+    noFavs: "Nessun preferito salvato",
+    lblVoz: "🔊 Lettura vocale",
+    lblTono: "🎚 Tono della voce",
+    btnBorrarFavs: "🗑️ Elimina tutti i preferiti",
+    btnGuardarFav: "⭐ Salva nei Preferiti",
+    confirmBorrar: "Sei sicuro di voler eliminare tutti i preferiti?",
+    thinking: "🍳 Lo chef sta pensando alla ricetta...",
+    errorInedible: "⚠️ Errore: Non è un ingrediente commestibile.",
+    nombreIdiomaIA: "Italian"
+  }
+};
+
+function cambiarIdiomaInterfaz() {
+  const lang = idioma.value;
+  const ui = traduccionesUI[lang] || traduccionesUI.es;
+
+  input.placeholder = ui.placeholder;
+  btn.innerText = ui.btnGenerar;
+  document.getElementById("disclaimerTxt").innerText = ui.disclaimer;
+  document.getElementById("lblFavs").innerText = ui.favTitle;
+  document.getElementById("lblVoz").innerText = ui.lblVoz;
+  document.getElementById("lblTono").innerText = ui.lblTono;
+  document.getElementById("btnBorrarFavs").innerText = ui.btnBorrarFavs;
+
+  const welcomeMsg = document.getElementById("welcomeMsg");
+  if (welcomeMsg) {
+    welcomeMsg.innerText = ui.welcome;
+  }
+  
+  pintarFav();
+}
 
 function toggleDark(){
   document.body.classList.toggle("dark");
@@ -304,7 +403,9 @@ function borrarFav(texto){
 }
 
 function vaciarFavs(){
-  if(confirm("¿Seguro que querés borrar todos los favoritos?")){
+  const lang = idioma.value;
+  const ui = traduccionesUI[lang] || traduccionesUI.es;
+  if(confirm(ui.confirmBorrar)){
     favs=[];
     localStorage.removeItem("favs");
     pintarFav();
@@ -312,9 +413,12 @@ function vaciarFavs(){
 }
 
 function pintarFav(){
+  const lang = idioma.value;
+  const ui = traduccionesUI[lang] || traduccionesUI.es;
   favBox.innerHTML="";
+  
   if(favs.length === 0){
-    favBox.innerHTML = "<small style='color:gray;'>No hay favoritas guardadas</small>";
+    favBox.innerHTML = `<small style='color:gray;'>${ui.noFavs}</small>`;
     return;
   }
   favs.forEach(f=>{
@@ -329,13 +433,10 @@ function pintarFav(){
     favBox.appendChild(d);
   });
 }
-pintarFav();
 
 function hablar(texto, lang) {
   if (!voz.checked) return;
-  
   let textoLimpio = texto.replace(/<[^>]*>?/gm, '');
-  textoLimpio = textoLimpio.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F900}-\u{1F9FF}\u{1F6D0}-\u{1F6FF}\u{1F004}\u{1F0CF}\u{1F170}-\u{1F251}]/gu, '');
 
   const mapaIdiomas = {
     'es': 'es-ES',
@@ -352,213 +453,53 @@ function hablar(texto, lang) {
   speechSynthesis.speak(s);
 }
 
-// DICCIONARIO ANTI-SPANGLISH
-const diccionarioGastronomico = {
-  "breadfruit": "fruta del pan",
-  "water": "agua",
-  "oil": "aceite",
-  "lettuce": "lechuga",
-  "codfish": "bacalao",
-  "salt": "sal",
-  "pepper": "pimienta",
-  "onion": "cebolla",
-  "garlic": "ajo",
-  "flour": "harina",
-  "sugar": "azúcar",
-  "butter": "manteca",
-  "milk": "leche",
-  "egg": "huevo",
-  "eggs": "huevos",
-  "chicken": "pollo",
-  "beef": "carne de res",
-  "pork": "cerdo",
-  "cheese": "queso",
-  "tomato": "tomate",
-  "as required": "cantidad necesaria",
-  "to taste": "a gusto",
-  "for frying": "para freír",
-  "slice": "cortar en rodajas",
-  "fry": "freír",
-  "boil": "hervir",
-  "bake": "hornear"
-};
+async function solicitarIA(promptTexto, langKey) {
+  const ui = traduccionesUI[langKey] || traduccionesUI.es;
+  
+  const systemPrompt = `You are a professional chef. You MUST write your ENTIRE response strictly in ${ui.nombreIdiomaIA}. Use simple HTML tags (<b>, <br>):\n<b>🍳 [RECIPE NAME IN ${ui.nombreIdiomaIA}]</b><br><br><b>⏱️ Time:</b> X min<br><br><b>🛒 Ingredients:</b><br>- Ingredient 1<br><br><b>🔥 Steps:</b><br>1. Step one.<br>2. Step two.`;
+  
+  const url = "https://text.pollinations.ai/" + encodeURIComponent(systemPrompt + "\n\nUser request: " + promptTexto) + "?model=openai";
 
-function traducirSpanglish(texto) {
-  let resultado = texto;
-  Object.keys(diccionarioGastronomico).forEach(clave => {
-    const regex = new RegExp("\\b" + clave + "\\b", "gi");
-    resultado = resultado.replace(regex, diccionarioGastronomico[clave]);
-  });
-  return resultado;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Error en servidor de IA");
+  return await res.text();
 }
 
-// RECETARIO EXACTO PARA PLATOS POPULARES
-const recetasEspecificas = {
-  "pizza": `<b>🍳 PIZZA ITALIANA TRADICIONAL</b><br><br>
-<b>⏱️ Tiempo:</b> 45 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes exactos:</b><br>
-- 250g de harina 000 (o común)<br>
-- 150ml de agua tibia<br>
-- 5g de levadura seca<br>
-- 1 cucharada de aceite de oliva<br>
-- 1/2 cucharadita de sal<br>
-- 100g de salsa de tomate<br>
-- 150g de queso mozzarella<br>
-- Orégano a gusto<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. En un bowl, disolvé la levadura en el agua tibia y dejá reposar 5 minutos.<br>
-2. Agregá la harina, la sal y el aceite. Mezclá y amasá durante 8 minutos hasta tener un bollo suave.<br>
-3. Tapá el bollo y dejalo leudar 30 minutos.<br>
-4. Estirá la masa sobre una asadera aceitada.<br>
-5. Cubrí con la salsa de tomate y el queso mozzarella.<br>
-6. Horneá a fuego máximo (220°C - 250°C) por 12 a 15 minutos hasta dorar la base.`,
-
-  "papas fritas": `<b>🍳 PAPAS FRITAS CROCANTES</b><br><br>
-<b>⏱️ Tiempo:</b> 25 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes exactos:</b><br>
-- 3 papas medianas<br>
-- 1/2 litro de aceite para freír<br>
-- Sal fina a gusto<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. Pelá y cortá las papas en bastones de 1 cm.<br>
-2. Secá las papas muy bien con papel absorbente.<br>
-3. Calentá el aceite en una sartén profunda a fuego medio-alto.<br>
-4. Cociná las papas durante 8-10 minutos hasta que estén doradas.<br>
-5. Retirá con espumadera, escurrí en papel de cocina y agregá sal de inmediato.`,
-
-  "hamburguesa": `<b>🍳 HAMBURGUESA CASERA JUGOSA</b><br><br>
-<b>⏱️ Tiempo:</b> 15 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes exactos:</b><br>
-- 200g de carne picada<br>
-- 1 pan de hamburguesa<br>
-- 1 feta de queso cheddar<br>
-- Sal y pimienta a gusto<br>
-- 1 cucharada de aceite<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. Formá un bollo con la carne y aplastalo hasta darle forma de disco de 1.5 cm de grosor.<br>
-2. Calentá una sartén a fuego alto con un chorrito de aceite.<br>
-3. Colocá la carne, condimentá con sal y pimienta. Cociná 3 minutos.<br>
-4. Dala vuelta, agregá el queso encima y cociná 3 minutos más.<br>
-5. Tostá el pan en la misma sartén y armá tu hamburguesa.`
-};
-
-// BUSCADOR CORREGIDO SIN RECETAS ABSURDAS
 async function obtenerReceta(consulta) {
   const clave = consulta.toLowerCase().trim();
+  const langKey = idioma.value;
+  const ui = traduccionesUI[langKey] || traduccionesUI.es;
 
-  // 1. Filtro de seguridad (evita ingredientes no comestibles / absurdos)
-  const palabrasProhibidas = ["uranio", "gema", "gemas", "infinito", "bobicraft", "plastico", "vidrio", "piedra", "veneno"];
-  const contieneProhibido = palabrasProhibidas.some(palabra => clave.includes(palabra));
-
-  if (contieneProhibido) {
-    return `⚠️ <b>Error de cocina:</b> "${clave}" no es un ingrediente comestible. ¡Probá buscando una receta de verdad!`;
+  const palabrasProhibidas = ["uranio", "plastico", "vidrio", "piedra", "veneno", "bobicraft", "uranium", "plastic", "glass"];
+  if (palabrasProhibidas.some(p => clave.includes(p))) {
+    return `${ui.errorInedible}`;
   }
 
-  // 2. Recetas locales exactas
-  for (let k in recetasEspecificas) {
-    if (clave.includes(k)) {
-      return recetasEspecificas[k];
-    }
-  }
-
-  // 3. Búsqueda en API gastronómica libre (TheMealDB)
   try {
-    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(clave)}`);
-    if (res.ok) {
-      const data = await res.json();
-      if (data.meals && data.meals.length > 0) {
-        const plato = data.meals[0];
-        
-        let ingredientesHTML = "";
-        for (let i = 1; i <= 15; i++) {
-          const ing = plato[`strIngredient${i}`];
-          const cant = plato[`strMeasure${i}`];
-          if (ing && ing.trim() !== "") {
-            ingredientesHTML += `- ${traducirSpanglish(ing)} (${cant ? traducirSpanglish(cant.trim()) : 'a gusto'})<br>`;
-          }
-        }
-
-        let instrucciones = traducirSpanglish(plato.strInstructions);
-
-        return `<b>🍳 ${traducirSpanglish(plato.strMeal).toUpperCase()}</b><br><br>
-<b>⏱️ Tiempo:</b> 30 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes exactos:</b><br>
-${ingredientesHTML}<br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-${instrucciones.replace(/\r\n|\r|\n/g, "<br>")}`;
-      }
+    let respuestaIA = await solicitarIA(clave, langKey);
+    if(respuestaIA && respuestaIA.length > 20) {
+      return respuestaIA.replace(/\n/g, "<br>");
     }
   } catch (e) {
-    console.log("Fallback a generador lógico");
+    console.log("Error consultando IA");
   }
 
-  // 4. Fallback por estructura gastronómica segura
-  const esMasa = clave.includes("pizza") || clave.includes("pan") || clave.includes("tarta") || clave.includes("empanada");
-  const esDulce = clave.includes("torta") || clave.includes("brownie") || clave.includes("galleta") || clave.includes("bizcocho");
-  const esSalado = clave.includes("carne") || clave.includes("pollo") || clave.includes("sopa") || clave.includes("guiso") || clave.includes("arroz") || clave.includes("fideos") || clave.includes("ensalada");
-
-  if (esMasa) {
-    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()} CASERA</b><br><br>
-<b>⏱️ Tiempo:</b> 40 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes para la base:</b><br>
-- 300g de harina común<br>
-- 150ml de agua tibia<br>
-- 1 cucharada de aceite<br>
-- 1 pizca de sal<br>
-- Relleno o cobertura a elección<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. En un bowl, mezclá la harina, la sal, el aceite y el agua tibia.<br>
-2. Amasá durante 7 minutos hasta tener una masa uniforme.<br>
-3. Dejá reposar la masa tapada durante 15 minutos.<br>
-4. Estirá sobre una fuente aceitada y agregá los ingredientes por encima.<br>
-5. Llevá a horno precalentado a 200°C por 15-20 minutos.`;
-  }
-
-  if (esDulce) {
-    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()} DULCE</b><br><br>
-<b>⏱️ Tiempo:</b> 35 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes exactos:</b><br>
-- 200g de harina leudante<br>
-- 100g de azúcar<br>
-- 2 huevos<br>
-- 50g de manteca derretida<br>
-- 1 cucharadita de esencia de vainilla<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. Batí los huevos con el azúcar en un bowl.<br>
-2. Integrá la manteca derretida y la vainilla.<br>
-3. Agregá la harina tamizada de a poco mezclando con espátula.<br>
-4. Verté en un molde enharinado y horneá a 180°C por 25 minutos.`;
-  }
-
-  if (esSalado) {
-    return `<b>🍳 PREPARACIÓN DE ${clave.toUpperCase()}</b><br><br>
-<b>⏱️ Tiempo:</b> 25 min | <b>Dificultad:</b> Fácil<br><br>
-<b>🛒 Ingredientes principales:</b><br>
-- Ración principal para ${clave}<br>
-- 1 cebolla y verduras a elección<br>
-- Sal, pimienta y condimentos a gusto<br>
-- 2 cucharadas de aceite<br><br>
-<b>🔥 Paso a Paso para principiantes:</b><br>
-1. Picá las verduras en cubos pequeños.<br>
-2. Saltéalas en una sartén con aceite a fuego medio por 5 minutos.<br>
-3. Agregá la proteína o ingrediente principal y condimentá.<br>
-4. Cociná revolviendo a fuego medio por 12-15 minutos hasta completar la cocción.`;
-  }
-
-  // 5. Mensaje si la búsqueda no coincide con ninguna comida válida
-  return `❌ <b>No encontré la receta para "${clave}".</b><br><br>Intentá buscando platos de comida reales como <i>lasaña, tacos, brownie, empanadas</i> o <i>guiso</i>.`;
+  return `<b>🍳 ${clave.toUpperCase()}</b><br><br><b>🛒 Ingredients:</b><br>- ${clave}<br><br><b>🔥 Steps:</b><br>1. Cook well.`;
 }
 
 async function enviar(){
   const t = input.value.trim();
   if(!t) return;
 
+  const langKey = idioma.value;
+  const ui = traduccionesUI[langKey] || traduccionesUI.es;
+
   btn.disabled = true;
   chat.innerHTML += `<div class="msg user">${t}</div>`;
 
   const ia = document.createElement("div");
   ia.className = "msg ia";
-  ia.innerHTML = "🔍 Preparando la receta paso a paso...";
+  ia.innerHTML = ui.thinking;
   chat.appendChild(ia);
   chat.scrollTop = chat.scrollHeight;
 
@@ -569,16 +510,18 @@ async function enviar(){
   const b = document.createElement("button");
   b.style.width = "auto";
   b.style.marginTop = "8px";
-  b.innerText = "⭐ Guardar";
+  b.innerText = ui.btnGuardarFav;
   b.onclick = () => guardarFav(t);
   ia.appendChild(b);
 
-  hablar(resultado, idioma.value);
+  hablar(resultado, langKey);
 
   input.value = "";
   chat.scrollTop = chat.scrollHeight;
   btn.disabled = false;
 }
+
+cambiarIdiomaInterfaz();
 </script>
 
 </body>
