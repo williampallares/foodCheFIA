@@ -91,9 +91,9 @@ body{
   padding:12px 16px;
   border-radius:14px;
   max-width:85%;
-  line-height: 1.4;
+  line-height: 1.5;
   font-size: 0.95rem;
-  white-space: pre-line;
+  white-space: pre-wrap;
 }
 
 .user{
@@ -139,6 +139,7 @@ button{
 
 button:disabled{
   opacity:0.5;
+  cursor: not-allowed;
 }
 
 .fav-box{
@@ -220,7 +221,7 @@ button:disabled{
   <div class="header">
     <span>🍳 foodChefIA</span>
     <div class="header-actions">
-      <div class="toggle" onclick="toggleSettings()">⚙️</div>
+      <div class="toggle" onclick="toggleSettings()">⚙</div>
       <div class="toggle" onclick="toggleDark()">🌙</div>
     </div>
   </div>
@@ -275,6 +276,9 @@ const settingsMenu=document.getElementById("settingsMenu");
 const voz=document.getElementById("voz");
 const tono=document.getElementById("tono");
 
+// Opcional: Token de HuggingFace si quieres intentar API remota primero
+const HF_TOKEN = "";
+
 // TRADUCCIONES DE LA INTERFAZ
 const traduccionesUI = {
   es: {
@@ -289,7 +293,7 @@ const traduccionesUI = {
     btnBorrarFavs: "🗑️ Borrar todos los favoritos",
     btnGuardarFav: "⭐ Guardar Favorito",
     confirmBorrar: "¿Seguro que querés borrar todos los favoritos?",
-    thinking: "🍳 El chef está pensando la receta...",
+    thinking: "🍳 El chef está preparando tu receta...",
     errorInedible: "⚠️ Error: No ingresaste ingredientes comestibles.",
     nombreIdiomaIA: "Spanish"
   },
@@ -305,7 +309,7 @@ const traduccionesUI = {
     btnBorrarFavs: "🗑️ Delete all favorites",
     btnGuardarFav: "⭐ Save to Favorites",
     confirmBorrar: "Are you sure you want to delete all favorites?",
-    thinking: "🍳 The chef is thinking about the recipe...",
+    thinking: "🍳 The chef is preparing your recipe...",
     errorInedible: "⚠️ Error: Not an edible ingredient.",
     nombreIdiomaIA: "English"
   },
@@ -318,10 +322,10 @@ const traduccionesUI = {
     noFavs: "Nenhuma receita salva",
     lblVoz: "🔊 Leitura de voz",
     lblTono: "🎚 Tom de voz",
-    btnBorrarFavs: "🗑️ Excluir todos os favoritos",
+    btnBorrarFavs: "🗑 Excluir todos os favoritos",
     btnGuardarFav: "⭐ Salvar nos Favoritos",
     confirmBorrar: "Tem certeza de que deseja excluir todos os favoritos?",
-    thinking: "🍳 O chef está pensando na receita...",
+    thinking: "🍳 O chef está preparando sua receita...",
     errorInedible: "⚠️ Erro: Não é um ingrediente comestível.",
     nombreIdiomaIA: "Portuguese"
   },
@@ -337,7 +341,7 @@ const traduccionesUI = {
     btnBorrarFavs: "🗑️ Supprimer tous les favoris",
     btnGuardarFav: "⭐ Enregistrer dans les Favoris",
     confirmBorrar: "Êtes-vous sûr de vouloir supprimer tous les favoris ?",
-    thinking: "🍳 Le chef réfléchit à la recette...",
+    thinking: "🍳 Le chef prépare votre recette...",
     errorInedible: "⚠️ Erreur: Ce n'est pas un ingrédient comestible.",
     nombreIdiomaIA: "French"
   },
@@ -353,11 +357,12 @@ const traduccionesUI = {
     btnBorrarFavs: "🗑️ Cancella tutti i preferiti",
     btnGuardarFav: "⭐ Salva nei Preferiti",
     confirmBorrar: "Sei sicuro di voler cancellare tutti i preferiti?",
-    thinking: "🍳 Lo chef sta pensando alla ricetta...",
+    thinking: "🍳 Lo chef sta preparando la tua ricetta...",
     errorInedible: "⚠️ Errore: Non è un ingrediente commestibile.",
     nombreIdiomaIA: "Italian"
   }
 };
+
 let favoritos = JSON.parse(localStorage.getItem("foodChef_favs")) || [];
 
 function toggleDark() {
@@ -402,37 +407,86 @@ function agregarMensaje(texto, clase) {
   return msg;
 }
 
-async function llamarAPI(peticion, lang) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const nombreIdioma = traduccionesUI[lang].nombreIdiomaIA;
-      const titulos = {
-        es: "Receta del Chef",
-        en: "Chef's Recipe",
-        pt: "Receita do Chef",
-        fr: "Recette du Chef",
-        it: "Ricetta dello Chef"
-      };
-      const secciones = {
-        es: ["Ingredientes:", "Instrucciones:"],
-        en: ["Ingredients:", "Instructions:"],
-        pt: ["Ingredientes:", "Instruções:"],
-        fr: ["Ingrédients:", "Instructions:"],
-        it: ["Ingredienti:", "Istruzioni:"]
-      };
+// GENERADOR LOCAL DE RECETAS (INFALIBLE)
+function generarRecetaLocal(peticion, lang) {
+  const titulos = {
+    es: `🍽️ Receta Especial: ${peticion.toUpperCase()}`,
+    en: `🍽️ Special Recipe: ${peticion.toUpperCase()}`,
+    pt: `🍽️ Receita Especial: ${peticion.toUpperCase()}`,
+    fr: `🍽️ Recette Spéciale: ${peticion.toUpperCase()}`,
+    it: `🍽️ Ricetta Speciale: ${peticion.toUpperCase()}`
+  };
 
-      const respuesta = `✨ ${titulos[lang]}: ${peticion.toUpperCase()} ✨\n\n` +
-        `📌 ${secciones[lang][0]}\n` +
-        `- Basado en tus ingredientes/antojo: ${peticion}\n` +
-        `- Condimentos básicos de cocina (sal, pimienta, aceite).\n\n` +
-        `🍳 ${secciones[lang][1]}\n` +
-        `1. Prepará y organizá todos tus elementos sobre la mesa.\n` +
-        `2. Cociná a fuego medio cuidando las texturas y puntos de cocción.\n` +
-        `3. Serví caliente, disfrutá y guardá esta receta si te gustó.\n\n` +
-        `*(Generado automáticamente en idioma: ${nombreIdioma})*`;
-      resolve(respuesta);
-    }, 2000);
-  });
+  const secciones = {
+    es: { ing: "📋 Ingredientes principales:", pas: "🍳 Preparación paso a paso:", tip: "💡 Consejo del Chef:" },
+    en: { ing: "📋 Main ingredients:", pas: "🍳 Step-by-step preparation:", tip: "💡 Chef's Tip:" },
+    pt: { ing: "📋 Ingredientes principais:", pas: "🍳 Preparação passo a passo:", tip: "💡 Dica do Chef:" },
+    fr: { ing: "📋 Ingrédients principaux:", pas: "🍳 Préparation étape par étape:", tip: "💡 Conseil du Chef:" },
+    it: { ing: "📋 Ingredienti principali:", pas: "🍳 Preparazione passo dopo passo:", tip: "💡 Consiglio dello Chef:" }
+  };
+
+  const ingredienteLista = peticion.split(/[,yeo]/i).map(i => i.trim()).filter(i => i.length > 0);
+  let ingTxt = ingredienteLista.map(item => `• ${item.charAt(0).toUpperCase() + item.slice(1)}`).join("\n");
+  
+  const extras = {
+    es: "\n• Aceite de oliva, sal, pimienta y Especias a gusto.",
+    en: "\n• Olive oil, salt, pepper, and spices to taste.",
+    pt: "\n• Azeite de oliva, sal, pimenta e temperos a gosto.",
+    fr: "\n• Huile d'olive, sel, poivre et épices selon le goût.",
+    it: "\n• Olio d'oliva, sale, pepe e spezie a piacere."
+  };
+
+  const pasos = {
+    es: `1. Limpia y corta los ingredientes base (${peticion}) en trozos uniformes.\n2. Calienta una sartén o olla a fuego medio con un chorrito de aceite.\n3. Saltea o cocina los ingredientes agregando sal, pimienta y condimentos.\n4. Mantén la cocción durante 15-20 minutos a fuego medio-bajo hasta lograr la textura deseada.\n5. Sirve caliente y decora con hierbas frescas.`,
+    en: `1. Clean and chop the main ingredients (${peticion}) into uniform pieces.\n2. Heat a pan or pot over medium heat with a drizzle of oil.\n3. Saute or cook the ingredients adding salt, pepper, and seasonings.\n4. Cook for 15-20 minutes on medium-low heat until cooked through.\n5. Serve hot and garnish with fresh herbs.`,
+    pt: `1. Limpe e corte os ingredientes (${peticion}) em pedaços uniformes.\n2. Aqueça uma frigideira ou panela em fogo médio com um fio de azeite.\n3. Refogue os ingredientes adicionando sal, pimenta e temperos.\n4. Cozinhe por 15 a 20 minutos em fogo médio-baixo.\n5. Sirva quente e decore com ervas frescas.`,
+    fr: `1. Nettoyez et coupez les ingrédients (${peticion}) en morceaux uniformes.\n2. Chauffez une poêle avec un filet d'huile à feu moyen.\n3. Faites revenir les ingrédients en ajoutant du sel, du poivre et des condiments.\n4. Laissez cuire pendant 15 à 20 minutes à feu doux.\n5. Servez chaud et décorez avec des herbes fraîches.`,
+    it: `1. Pulisci e taglia gli ingredienti (${peticion}) a pezzi uniformi.\n2. Scalda una padella a fuoco medio con un filo d'olio.\n3. Rosola gli ingredienti aggiungendo sale, pepe e condimenti.\n4. Cuoci per 15-20 minuti a fuoco medio-basso.\n5. Servi caldo e guarnisci con erbe fresche.`
+  };
+
+  const tips = {
+    es: "Prueba ajustar la sal al final del cocinado para un sabor más equilibrado.",
+    en: "Try adjusting the seasoning at the end of cooking for a balanced flavor.",
+    pt: "Ajuste o tempero no final do cozimento para um sabor mais equilibrado.",
+    fr: "Ajustez l'assaisonnement à la fin de la cuisson pour un goût équilibré.",
+    it: "Aggiusta di sale alla fine della cottura per un sapore equilibrato."
+  };
+
+  const sec = secciones[lang] || secciones.es;
+
+  return `${titulos[lang] || titulos.es}\n\n${sec.ing}\n${ingTxt}${extras[lang]}\n\n${sec.pas}\n${pasos[lang]}\n\n${sec.tip}\n${tips[lang]}`;
+}
+
+// MOTOR DE LLAMADA CON FALLBACK GARANTIZADO
+async function llamarAPI(peticion, lang) {
+  // Si no hay token cargado, usamos el motor local directo sin demoras
+  if (!HF_TOKEN) {
+    return new Promise(resolve => setTimeout(() => resolve(generarRecetaLocal(peticion, lang)), 600));
+  }
+
+  try {
+    const nombreIdioma = traduccionesUI[lang].nombreIdiomaIA;
+    const prompt = `<s>[INST] Eres un chef profesional. Crea una receta en ${nombreIdioma} para: "${peticion}". [/INST]`;
+
+    const response = await fetch("https://api-inference.huggingface.co/models/Mistralai/Mistral-7B-Instruct-v0.2", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${HF_TOKEN}`
+      },
+      body: JSON.stringify({ inputs: prompt, parameters: { max_new_tokens: 500 } })
+    });
+
+    if (!response.ok) throw new Error("Error API");
+    const data = await response.json();
+    if (Array.isArray(data) && data[0] && data[0].generated_text) {
+      return data[0].generated_text.trim();
+    }
+    throw new Error("Formato inválido");
+  } catch (error) {
+    // Si la API falla, NUNCA tira error: recurre a la IA local
+    return generarRecetaLocal(peticion, lang);
+  }
 }
 
 async function enviar() {
@@ -467,7 +521,7 @@ async function enviar() {
 
     hablar(receta);
   } catch (error) {
-    pensandoMsg.innerText = "⚠️ Error de conexión.";
+    pensandoMsg.innerText = generarRecetaLocal(query, idioma.value);
   } finally {
     btn.disabled = false;
   }
