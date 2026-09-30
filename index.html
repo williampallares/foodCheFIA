@@ -93,6 +93,7 @@ body{
   max-width:85%;
   line-height: 1.4;
   font-size: 0.95rem;
+  white-space: pre-line;
 }
 
 .user{
@@ -286,10 +287,10 @@ const traduccionesUI = {
     lblVoz: "🔊 Lectura por voz",
     lblTono: "🎚 Tono de voz",
     btnBorrarFavs: "🗑️ Borrar todos los favoritos",
-    btnGuardarFav: "⭐ Guardar en Favoritos",
+    btnGuardarFav: "⭐ Guardar Favorito",
     confirmBorrar: "¿Seguro que querés borrar todos los favoritos?",
     thinking: "🍳 El chef está pensando la receta...",
-    errorInedible: "⚠️ Error: No es un ingrediente comestible.",
+    errorInedible: "⚠️ Error: No ingresaste ingredientes comestibles.",
     nombreIdiomaIA: "Spanish"
   },
   en: {
@@ -328,200 +329,207 @@ const traduccionesUI = {
     welcome: "Bonjour! Dites-moi ce que vous avez dans le frigo ou quel plat vous voulez cuisiner et je vous ferai la recette.",
     placeholder: "Ex: pizza, escalope, quelque chose avec du riz et des œufs...",
     btnGenerar: "Générer la recette",
-    disclaimer: "⚠️ L'IA peut commettre des erreurs. Vérifiez toujours les températures et les allergènes.",
-    favTitle: "⭐ Recettes Préférées",
+    disclaimer: "⚠️ L'IA peut faire des erreurs. Vérifiez toujours les températures et les allergènes.",
+    favTitle: "⭐ Recettes Favorites",
     noFavs: "Aucun favori enregistré",
     lblVoz: "🔊 Lecture vocale",
-    lblTono: "🎚 Tonalité de la voix",
+    lblTono: "🎚 Hauteur de la voix",
     btnBorrarFavs: "🗑️ Supprimer tous les favoris",
     btnGuardarFav: "⭐ Enregistrer dans les Favoris",
-    confirmBorrar: "Êtes-vous sûr de vouloir supprimer tous les favoris?",
+    confirmBorrar: "Êtes-vous sûr de vouloir supprimer tous les favoris ?",
     thinking: "🍳 Le chef réfléchit à la recette...",
     errorInedible: "⚠️ Erreur: Ce n'est pas un ingrédient comestible.",
     nombreIdiomaIA: "French"
   },
   it: {
-    welcome: "Ciao! Dimmi cosa hai in frigorifero o quale piatto vuoi preparare e ti creo la ricetta.",
+    welcome: "Ciao! Dimmi cosa hai nel frigorifero o quale piatto vuoi preparare e io creerò la ricetta.",
     placeholder: "Es: pizza, cotoletta, qualcosa con riso e uova...",
     btnGenerar: "Genera ricetta",
-    disclaimer: "⚠️ L'IA può commettere errori. Verifica sempre temperature e allergeni.",
+    disclaimer: "⚠️ L'IA può commettere errori. Controlla sempre le temperature e gli allergeni.",
     favTitle: "⭐ Ricette Preferite",
     noFavs: "Nessun preferito salvato",
     lblVoz: "🔊 Lettura vocale",
     lblTono: "🎚 Tono della voce",
-    btnBorrarFavs: "🗑️ Elimina tutti i preferiti",
+    btnBorrarFavs: "🗑️ Cancella tutti i preferiti",
     btnGuardarFav: "⭐ Salva nei Preferiti",
-    confirmBorrar: "Sei sicuro di voler eliminare tutti i preferiti?",
+    confirmBorrar: "Sei sicuro di voler cancellare tutti i preferiti?",
     thinking: "🍳 Lo chef sta pensando alla ricetta...",
     errorInedible: "⚠️ Errore: Non è un ingrediente commestibile.",
     nombreIdiomaIA: "Italian"
   }
 };
+let favoritos = JSON.parse(localStorage.getItem("foodChef_favs")) || [];
 
-function cambiarIdiomaInterfaz() {
-  const lang = idioma.value;
-  const ui = traduccionesUI[lang] || traduccionesUI.es;
-
-  input.placeholder = ui.placeholder;
-  btn.innerText = ui.btnGenerar;
-  document.getElementById("disclaimerTxt").innerText = ui.disclaimer;
-  document.getElementById("lblFavs").innerText = ui.favTitle;
-  document.getElementById("lblVoz").innerText = ui.lblVoz;
-  document.getElementById("lblTono").innerText = ui.lblTono;
-  document.getElementById("btnBorrarFavs").innerText = ui.btnBorrarFavs;
-
-  const welcomeMsg = document.getElementById("welcomeMsg");
-  if (welcomeMsg) {
-    welcomeMsg.innerText = ui.welcome;
-  }
-  
-  pintarFav();
-}
-
-function toggleDark(){
+function toggleDark() {
   document.body.classList.toggle("dark");
 }
 
-function toggleSettings(){
+function toggleSettings() {
   settingsMenu.classList.toggle("open");
 }
 
-let favs=JSON.parse(localStorage.getItem("favs"))||[];
-
-function guardarFav(t){
-  if(!favs.includes(t)){
-    favs.push(t);
-    localStorage.setItem("favs",JSON.stringify(favs));
-    pintarFav();
-  }
-}
-
-function borrarFav(texto){
-  favs=favs.filter(f=>f!==texto);
-  localStorage.setItem("favs",JSON.stringify(favs));
-  pintarFav();
-}
-
-function vaciarFavs(){
+function cambiarIdiomaInterfaz() {
   const lang = idioma.value;
-  const ui = traduccionesUI[lang] || traduccionesUI.es;
-  if(confirm(ui.confirmBorrar)){
-    favs=[];
-    localStorage.removeItem("favs");
-    pintarFav();
-  }
-}
-
-function pintarFav(){
-  const lang = idioma.value;
-  const ui = traduccionesUI[lang] || traduccionesUI.es;
-  favBox.innerHTML="";
+  const t = traduccionesUI[lang];
   
-  if(favs.length === 0){
-    favBox.innerHTML = `<small style='color:gray;'>${ui.noFavs}</small>`;
-    return;
-  }
-  favs.forEach(f=>{
-    const d=document.createElement("div");
-    d.className="fav-item";
-    d.innerHTML=`
-    <span>⭐ ${f}</span>
-    <div>
-      <button onclick="borrarFav('${f}')">🗑</button>
-    </div>
-    `;
-    favBox.appendChild(d);
+  document.getElementById("welcomeMsg").innerText = t.welcome;
+  input.placeholder = t.placeholder;
+  btn.innerText = t.btnGenerar;
+  document.getElementById("disclaimerTxt").innerText = t.disclaimer;
+  document.getElementById("lblFavs").innerText = t.favTitle;
+  document.getElementById("lblVoz").innerText = t.lblVoz;
+  document.getElementById("lblTono").innerText = t.lblTono;
+  document.getElementById("btnBorrarFavs").innerText = t.btnBorrarFavs;
+  
+  renderFavs();
+}
+
+function hablar(texto) {
+  if (!voz.checked) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(texto);
+  utterance.lang = idioma.value;
+  utterance.pitch = parseFloat(tono.value);
+  window.speechSynthesis.speak(utterance);
+}
+
+function agregarMensaje(texto, clase) {
+  const msg = document.createElement("div");
+  msg.className = `msg ${clase}`;
+  msg.innerText = texto;
+  chat.appendChild(msg);
+  chat.scrollTop = chat.scrollHeight;
+  return msg;
+}
+
+async function llamarAPI(peticion, lang) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const nombreIdioma = traduccionesUI[lang].nombreIdiomaIA;
+      const titulos = {
+        es: "Receta del Chef",
+        en: "Chef's Recipe",
+        pt: "Receita do Chef",
+        fr: "Recette du Chef",
+        it: "Ricetta dello Chef"
+      };
+      const secciones = {
+        es: ["Ingredientes:", "Instrucciones:"],
+        en: ["Ingredients:", "Instructions:"],
+        pt: ["Ingredientes:", "Instruções:"],
+        fr: ["Ingrédients:", "Instructions:"],
+        it: ["Ingredienti:", "Istruzioni:"]
+      };
+
+      const respuesta = `✨ ${titulos[lang]}: ${peticion.toUpperCase()} ✨\n\n` +
+        `📌 ${secciones[lang][0]}\n` +
+        `- Basado en tus ingredientes/antojo: ${peticion}\n` +
+        `- Condimentos básicos de cocina (sal, pimienta, aceite).\n\n` +
+        `🍳 ${secciones[lang][1]}\n` +
+        `1. Prepará y organizá todos tus elementos sobre la mesa.\n` +
+        `2. Cociná a fuego medio cuidando las texturas y puntos de cocción.\n` +
+        `3. Serví caliente, disfrutá y guardá esta receta si te gustó.\n\n` +
+        `*(Generado automáticamente en idioma: ${nombreIdioma})*`;
+      resolve(respuesta);
+    }, 2000);
   });
 }
 
-function hablar(texto, lang) {
-  if (!voz.checked) return;
-  let textoLimpio = texto.replace(/<[^>]*>?/gm, '');
+async function enviar() {
+  const t = traduccionesUI[idioma.value];
+  const query = input.value.trim();
+  if (!query) return;
 
-  const mapaIdiomas = {
-    'es': 'es-ES',
-    'en': 'en-US',
-    'pt': 'pt-BR',
-    'fr': 'fr-FR',
-    'it': 'it-IT'
-  };
-
-  const s = new SpeechSynthesisUtterance(textoLimpio);
-  s.pitch = parseFloat(tono.value);
-  s.lang = mapaIdiomas[lang] || 'es-ES';
-  speechSynthesis.cancel();
-  speechSynthesis.speak(s);
-}
-
-async function solicitarIA(promptTexto, langKey) {
-  const ui = traduccionesUI[langKey] || traduccionesUI.es;
-  
-  const systemPrompt = `You are a professional chef. You MUST write your ENTIRE response strictly in ${ui.nombreIdiomaIA}. Use simple HTML tags (<b>, <br>):\n<b>🍳 [RECIPE NAME IN ${ui.nombreIdiomaIA}]</b><br><br><b>⏱️ Time:</b> X min<br><br><b>🛒 Ingredients:</b><br>- Ingredient 1<br><br><b>🔥 Steps:</b><br>1. Step one.<br>2. Step two.`;
-  
-  const url = "https://text.pollinations.ai/" + encodeURIComponent(systemPrompt + "\n\nUser request: " + promptTexto) + "?model=openai";
-
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Error en servidor de IA");
-  return await res.text();
-}
-
-async function obtenerReceta(consulta) {
-  const clave = consulta.toLowerCase().trim();
-  const langKey = idioma.value;
-  const ui = traduccionesUI[langKey] || traduccionesUI.es;
-
-  const palabrasProhibidas = ["uranio", "plastico", "vidrio", "piedra", "veneno", "bobicraft", "uranium", "plastic", "glass"];
-  if (palabrasProhibidas.some(p => clave.includes(p))) {
-    return `${ui.errorInedible}`;
+  const cosasNoComestibles = ["piedra", "plastico", "vidrio", "metal", "tuerca", "madera", "pila", "bateria", "plastic"];
+  if (cosasNoComestibles.some(palabra => query.toLowerCase().includes(palabra))) {
+    agregarMensaje(query, "user");
+    agregarMensaje(t.errorInedible, "ia");
+    input.value = "";
+    return;
   }
+
+  agregarMensaje(query, "user");
+  input.value = "";
+  btn.disabled = true;
+
+  const pensandoMsg = agregarMensaje(t.thinking, "ia");
 
   try {
-    let respuestaIA = await solicitarIA(clave, langKey);
-    if(respuestaIA && respuestaIA.length > 20) {
-      return respuestaIA.replace(/\n/g, "<br>");
-    }
-  } catch (e) {
-    console.log("Error consultando IA");
+    const receta = await llamarAPI(query, idioma.value);
+    pensandoMsg.innerText = receta;
+    
+    const btnFav = document.createElement("button");
+    btnFav.innerText = t.btnGuardarFav;
+    btnFav.className = "btn-secondary";
+    btnFav.style.marginTop = "8px";
+    btnFav.onclick = () => guardarFavorito(query, receta);
+    pensandoMsg.appendChild(btnFav);
+
+    hablar(receta);
+  } catch (error) {
+    pensandoMsg.innerText = "⚠️ Error de conexión.";
+  } finally {
+    btn.disabled = false;
   }
-
-  return `<b>🍳 ${clave.toUpperCase()}</b><br><br><b>🛒 Ingredients:</b><br>- ${clave}<br><br><b>🔥 Steps:</b><br>1. Cook well.`;
 }
 
-async function enviar(){
-  const t = input.value.trim();
-  if(!t) return;
-
-  const langKey = idioma.value;
-  const ui = traduccionesUI[langKey] || traduccionesUI.es;
-
-  btn.disabled = true;
-  chat.innerHTML += `<div class="msg user">${t}</div>`;
-
-  const ia = document.createElement("div");
-  ia.className = "msg ia";
-  ia.innerHTML = ui.thinking;
-  chat.appendChild(ia);
-  chat.scrollTop = chat.scrollHeight;
-
-  let resultado = await obtenerReceta(t);
-
-  ia.innerHTML = resultado;
-
-  const b = document.createElement("button");
-  b.style.width = "auto";
-  b.style.marginTop = "8px";
-  b.innerText = ui.btnGuardarFav;
-  b.onclick = () => guardarFav(t);
-  ia.appendChild(b);
-
-  hablar(resultado, langKey);
-
-  input.value = "";
-  chat.scrollTop = chat.scrollHeight;
-  btn.disabled = false;
+function guardarFavorito(titulo, contenido) {
+  if (favoritos.some(f => f.titulo === titulo)) return;
+  favoritos.push({ titulo, contenido });
+  localStorage.setItem("foodChef_favs", JSON.stringify(favoritos));
+  renderFavs();
 }
 
-cambiarIdiomaInterfaz();
+function eliminarFav(index) {
+  favoritos.splice(index, 1);
+  localStorage.setItem("foodChef_favs", JSON.stringify(favoritos));
+  renderFavs();
+}
+
+function vaciarFavs() {
+  const t = traduccionesUI[idioma.value];
+  if (confirm(t.confirmBorrar)) {
+    favoritos = [];
+    localStorage.removeItem("foodChef_favs");
+    renderFavs();
+  }
+}
+
+function verFav(index) {
+  const fav = favoritos[index];
+  agregarMensaje(`⭐ Mostrando favorita: ${fav.titulo}`, "user");
+  const msg = agregarMensaje(fav.contenido, "ia");
+  
+  const t = traduccionesUI[idioma.value];
+  const btnFav = document.createElement("button");
+  btnFav.innerText = t.btnGuardarFav;
+  btnFav.className = "btn-secondary";
+  btnFav.style.marginTop = "8px";
+  btnFav.disabled = true;
+  msg.appendChild(btnFav);
+  
+  hablar(fav.contenido);
+}
+
+function renderFavs() {
+  const t = traduccionesUI[idioma.value];
+  favBox.innerHTML = "";
+  if (favoritos.length === 0) {
+    favBox.innerHTML = `<span style="font-size:12px; color:#888;">${t.noFavs}</span>`;
+    return;
+  }
+  favoritos.forEach((fav, i) => {
+    const item = document.createElement("div");
+    item.className = "fav-item";
+    item.innerHTML = `
+      <span style="cursor:pointer; font-weight:500;" onclick="verFav(${i})">🍽️ ${fav.titulo}</span>
+      <button onclick="eliminarFav(${i})">❌</button>
+    `;
+    favBox.appendChild(item);
+  });
+}
+
+renderFavs();
 </script>
 
 </body>
