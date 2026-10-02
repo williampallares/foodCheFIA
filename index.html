@@ -1,334 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="google-site-verification" content="yywbw6_mrRueQXmPC21salsDG8-Znxr-ltscnUtV3nk" />
-
-<!-- META TAGS ANTI-CACHÉ -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
-<title>foodChefIA</title>
-
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><title>foodChefIA</title>
 <style>
-:root{
-  --bg:#f4f6f8;
-  --card:#ffffff;
-  --text:#222222;
-  --primary:#d60000;
-  --secondary:#eaeaea;
-  --accent:#007bff;
-}
-
-body.dark{
-  --bg:#121212;
-  --card:#1e1e1e;
-  --text:#ffffff;
-  --secondary:#2a2a2a;
-  --primary:#ff8c00;
-  --accent:#ffd700;
-}
-
-body{
-  margin:0;
-  font-family:"Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items: center;
-  padding:15px;
-  font-weight:bold;
-  font-size: 1.2rem;
-  border-bottom: 1px solid var(--secondary);
-}
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-}
-
-.toggle{
-  background:#222;
-  color:white;
-  padding:6px 12px;
-  border-radius:10px;
-  cursor:pointer;
-  font-size: 0.9rem;
-  user-select: none;
-}
-
-.container{
-  width:100%;
-  max-width:520px;
-  background: var(--card);
-  padding:15px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-  position: relative;
-}
-
-.chat{
-  height:320px;
-  overflow-y:auto;
-  background:var(--secondary);
-  border-radius:14px;
-  padding:12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.msg{
-  padding:12px 16px;
-  border-radius:14px;
-  max-width:85%;
-  line-height: 1.5;
-  font-size: 0.95rem;
-  white-space: pre-wrap;
-}
-
-.user{
-  background:var(--primary);
-  color:white;
-  align-self: flex-end;
-  border-bottom-right-radius: 2px;
-}
-
-.ia{
-  background:var(--card);
-  color:var(--text);
-  align-self: flex-start;
-  border-bottom-left-radius: 2px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-input, select{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
-  box-sizing: border-box;
-  font-size: 0.95rem;
-  outline: none;
-  background: var(--card);
-  color: var(--text);
-}
-
-button{
-  padding:12px;
-  border:none;
-  border-radius:10px;
-  background:var(--primary);
-  color:white;
-  cursor:pointer;
-  margin-top:10px;
-  width: 100%;
-  font-weight: bold;
-  font-size: 1rem;
-}
-
-button:disabled{
-  opacity:0.5;
-  cursor: not-allowed;
-}
-
-.fav-box{
-  margin-top:15px;
-  background:var(--secondary);
-  padding:12px;
-  border-radius:10px;
-}
-
-.fav-item{
-  margin-top:8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: var(--card);
-  padding: 8px 12px;
-  border-radius: 8px;
-}
-
-.fav-item button{
-  margin-left:5px;
-  padding:4px 8px;
-  font-size:12px;
-  width: auto;
-  margin-top: 0;
-}
-
-.settings-menu {
-  display: none;
-  position: absolute;
-  top: 60px;
-  right: 15px;
-  width: 260px;
-  background: var(--card);
-  border: 1px solid var(--secondary);
-  border-radius: 12px;
-  padding: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  z-index: 100;
-}
-
-.settings-menu.open {
-  display: block;
-}
-
-.setting-option {
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-}
-
-.setting-option label {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.setting-option input[type="range"] {
-  padding: 0;
-  margin-top: 5px;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  font-size: 0.85rem;
-  padding: 8px;
-}
-
-.disclaimer {
-  text-align: center;
-  font-size: 11px;
-  color: #888;
-  margin-top: 10px;
-}
+:root{--bg:#f4f6f8;--card:#ffffff;--text:#222222;--primary:#d60000;--secondary:#eaeaea;}
+body.dark{--bg:#121212;--card:#1e1e1e;--text:#ffffff;--secondary:#2a2a2a;--primary:#ff8c00;}
+body{margin:0;font-family:"Segoe UI",sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;align-items:center;min-height:100vh;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:15px;font-weight:bold;border-bottom:1px solid var(--secondary);}
+.header-actions{display:flex;gap:8px;align-items:center;}
+.toggle{background:#222;color:white;padding:6px 12px;border-radius:10px;cursor:pointer;user-select:none;font-size:0.9rem;}
+.container{width:100%;max-width:520px;background:var(--card);padding:15px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,0.1);position:relative;}
+.chat{height:280px;overflow-y:auto;background:var(--secondary);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.msg{padding:12px 16px;border-radius:14px;max-width:85%;line-height:1.5;font-size:0.95rem;white-space:pre-wrap;position:relative;}
+.user{background:var(--primary);color:white;align-self:flex-end;border-bottom-right-radius:2px;}
+.ia{background:var(--card);color:var(--text);align-self:flex-start;border-bottom-left-radius:2px;box-shadow:0 2px 5px rgba(0,0,0,0.05);}
+input,select{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:1px solid #ccc;box-sizing:border-box;outline:none;background:var(--card);color:var(--text);font-size:0.95rem;}
+button{padding:12px;border:none;border-radius:10px;background:var(--primary);color:white;cursor:pointer;margin-top:10px;width:100%;font-weight:bold;font-size:1rem;}
+button:disabled{opacity:0.5;cursor:not-allowed;}
+.fav-box{margin-top:15px;background:var(--secondary);padding:12px;border-radius:10px;color:var(--text);}
+.fav-item{margin-top:8px;display:flex;align-items:center;justify-content:space-between;background:var(--card);padding:8px 12px;border-radius:8px;font-size:0.9rem;box-shadow:0 2px 4px rgba(0,0,0,0.05);}
+.fav-item button{margin-left:5px;padding:4px 8px;font-size:11px;width:auto;margin-top:0;background:#6c757d;color:white;border:none;border-radius:4px;cursor:pointer;}
+.btn-fav-add{background:none;border:none;color:#ff8c00;cursor:pointer;font-size:1.1rem;padding:0;margin-top:10px;width:auto;font-weight:bold;display:block;}
+.settings-menu{display:none;position:absolute;top:60px;right:15px;width:260px;background:var(--card);border:1px solid var(--secondary);border-radius:12px;padding:15px;box-shadow:0 4px 15px rgba(0,0,0,0.2);z-index:100;}
+.settings-menu.open{display:block;}
+.setting-option{margin-bottom:12px;font-size:0.9rem;}
+.setting-option label{display:flex;justify-content:space-between;align-items:center;}
+.btn-secondary{background:#6c757d;font-size:0.85rem;padding:8px;}
+.disclaimer{text-align:center;font-size:11px;color:#888;margin-top:10px;}
 </style>
 </head>
 <body>
-
 <div class="container">
-  <div class="header">
-    <span>🍳 foodChefIA</span>
-    <div class="header-actions">
-      <div class="toggle" onclick="toggleSettings()">⚙</div>
-      <div class="toggle" onclick="toggleDark()">🌙</div>
-    </div>
+  <div class="header"><span>🍳 foodChefIA</span>
+    <div class="header-actions"><div class="toggle" onclick="toggleSettings()">⚙</div><div class="toggle" onclick="toggleDark()">🌙</div></div>
   </div>
-
   <div id="settingsMenu" class="settings-menu">
-    <div class="setting-option">
-      <label>
-        <b id="lblVoz">🔊 Lectura por voz</b>
-        <input type="checkbox" id="voz">
-      </label>
-    </div>
-    
-    <div class="setting-option">
-      <label><b id="lblTono">🎚 Tono de voz</b></label>
-      <input type="range" id="tono" min="0.5" max="2" step="0.1" value="1">
-    </div>
-
+    <div class="setting-option"><label><b id="lblVoz">🔊 Lectura por voz</b><input type="checkbox" id="voz"></label></div>
+    <div class="setting-option"><label><b id="lblTono">🎚 Tono de voz</b><input type="range" id="tono" min="0.5" max="2" step="0.1" value="1"></label></div>
     <button class="btn-secondary" id="btnBorrarFavs" onclick="vaciarFavs()">🗑️ Borrar todos los favoritos</button>
   </div>
-
-  <div id="chat" class="chat">
-    <div class="msg ia" id="welcomeMsg">¡Hola! Decime qué tenés en la heladera o qué plato querés preparar y te armo la receta.</div>
-  </div>
-
+  <div id="chat" class="chat"><div class="msg ia" id="welcomeMsg">¡Hola! Decime qué tenés en la heladera y te busco la receta.</div></div>
   <input id="input" placeholder="Ej: pizza, milanesas, algo con arroz y huevo..." onkeydown="if(event.key==='Enter') enviar()">
-
   <select id="idioma" onchange="cambiarIdiomaInterfaz()">
-    <option value="es">Español</option>
-    <option value="en">English</option>
-    <option value="pt">Português</option>
-    <option value="fr">Français</option>
-    <option value="it">Italiano</option>
+    <option value="es">Español</option><option value="en">English</option><option value="pt">Português</option><option value="fr">Français</option><option value="it">Italiano</option>
   </select>
-
   <button id="btn" onclick="enviar()">Generar receta</button>
-
-  <p class="disclaimer" id="disclaimerTxt">⚠️ La IA puede cometer errores. Verifica siempre temperaturas y alérgenos.</p>
-
-  <div class="fav-box">
-    <b id="lblFavs">⭐ Recetas Favoritas</b>
-    <div id="fav"></div>
-  </div>
+  <p class="disclaimer" id="disclaimerTxt">⚠️ La IA puede cometer errores.</p>
+  <div class="fav-box"><b id="lblFavs">⭐ Recetas Favoritas</b><div id="fav"></div></div>
 </div>
-
 <script>
-const chat=document.getElementById("chat");
-const input=document.getElementById("input");
-const idioma=document.getElementById("idioma");
-const btn=document.getElementById("btn");
-const favBox=document.getElementById("fav");
-const settingsMenu=document.getElementById("settingsMenu");
-const voz=document.getElementById("voz");
-const tono=document.getElementById("tono");
-
-// Opcional: Token de HuggingFace si quieres intentar API remota primero
-const HF_TOKEN = "";
-
-// TRADUCCIONES DE LA INTERFAZ
-const traduccionesUI = {
-  es: {
-    welcome: "¡Hola! Decime qué tenés en la heladera o qué plato querés preparar y te armo la receta.",
-    placeholder: "Ej: pizza, milanesas, algo con arroz y huevo...",
-    btnGenerar: "Generar receta",
-    disclaimer: "⚠️ La IA puede cometer errores. Verifica siempre temperaturas y alérgenos.",
-    favTitle: "⭐ Recetas Favoritas",
-    noFavs: "No hay favoritas guardadas",
-    lblVoz: "🔊 Lectura por voz",
-    lblTono: "🎚 Tono de voz",
-    btnBorrarFavs: "🗑️ Borrar todos los favoritos",
-    btnGuardarFav: "⭐ Guardar Favorito",
-    confirmBorrar: "¿Seguro que querés borrar todos los favoritos?",
-    thinking: "🍳 El chef está preparando tu receta...",
-    errorInedible: "⚠️ Error: No ingresaste ingredientes comestibles.",
-    nombreIdiomaIA: "Spanish"
-  },
-  en: {
-    welcome: "Hello! Tell me what you have in the fridge or what dish you want to make, and I'll create the recipe.",
-    placeholder: "Ex: pizza, chicken cutlet, something with rice and eggs...",
-    btnGenerar: "Generate recipe",
-    disclaimer: "⚠️ AI can make mistakes. Always check cooking temperatures and allergens.",
-    favTitle: "⭐ Favorite Recipes",
-    noFavs: "No saved favorites",
-    lblVoz: "🔊 Voice reading",
-    lblTono: "🎚 Voice pitch",
-    btnBorrarFavs: "🗑️ Delete all favorites",
-    btnGuardarFav: "⭐ Save to Favorites",
-    confirmBorrar: "Are you sure you want to delete all favorites?",
-    thinking: "🍳 The chef is preparing your recipe...",
-    errorInedible: "⚠️ Error: Not an edible ingredient.",
-    nombreIdiomaIA: "English"
-  },
-  pt: {
-    welcome: "Olá! Diga-me o que você tem na geladeira ou qual prato quer preparar e eu criarei a receita.",
-    placeholder: "Ex: pizza, bife empanado, algo com arroz e ovo...",
-    btnGenerar: "Gerar receita",
-    disclaimer: "⚠️ A IA puede cometer erros. Sempre verifique temperaturas e alérgenos.",
-    favTitle: "⭐ Receitas Favoritas",
-    noFavs: "Nenhuma receita salva",
-    lblVoz: "🔊 Leitura de voz",
-    lblTono: "🎚 Tom de voz",
-    btnBorrarFavs: "🗑 Excluir todos os favoritos",
-    btnGuardarFav: "⭐ Salvar nos Favoritos",
-    confirmBorrar: "Tem certeza de que deseja excluir todos os favoritos?",
-    thinking: "🍳 O chef está preparando sua receita..."
-  }
+const chat=document.getElementById("chat"),input=document.getElementById("input"),idioma=document.getElementById("idioma"),btn=document.getElementById("btn"),favBox=document.getElementById("fav"),settingsMenu=document.getElementById("settingsMenu"),voz=document.getElementById("voz"),tono=document.getElementById("tono");
+let tGl = "";
+const txUI = {
+  es: { welcome: "¡Hola! Decime qué tenés en la heladera y te busco la receta.", placeholder: "Ej: pastel, milanesa, pizza, empanadas...", btnGenerar: "Generar receta", thinking: "📖 Buscando receta...", disclaimer: "⚠️ La IA puede cometer errores.", favTitle: "⭐ Recetas Favoritas", noFavs: "No hay favoritas", confirmBorrar: "¿Borrar todos?", lblVoz: "🔊 Lectura por voz", lblTono: "🎚 Tono de voz", btnBorrarFavs: "🗑️ Borrar favoritos", btnGuardarFav: "⭐ Guardar en Favoritos" },
+  en: { welcome: "Hello! Tell me what you have and I'll find the recipe.", placeholder: "Ex: cake, pizza, burger...", btnGenerar: "Generate recipe", thinking: "📖 Searching...", disclaimer: "⚠️ AI can make mistakes.", favTitle: "⭐ Favorite Recipes", noFavs: "No saved favorites", confirmBorrar: "Delete all?", lblVoz: "🔊 Voice reading", lblTono: "🎚 Voice pitch", btnBorrarFavs: "🗑️ Delete all", btnGuardarFav: "⭐ Save to Favorites" },
+  pt: { welcome: "Olá! Diga-me o que você tem e eu encontrarei a receita.", placeholder: "Ex: bolo, pizza...", btnGenerar: "Gerar receita", thinking: "📖 Buscando...", disclaimer: "⚠️ A IA pode cometer erros.", favTitle: "⭐ Receitas Favoritas", noFavs: "Nenhuma salva", confirmBorrar: "Excluir todos?", lblVoz: "🔊 Leitura de voz", lblTono: "🎚 Tom de voz", btnBorrarFavs: "🗑 Excluir favoritos", btnGuardarFav: "⭐ Salvar nos Favoritos" },
+  fr: { welcome: "Bonjour! Dites-moi ce que vous avez et je trouverai la recette.", placeholder: "Ex: gâteau, pizza...", btnGenerar: "Générer la recette", thinking: "📖 Recherche...", disclaimer: "⚠️ L'IA peut faire des erreurs.", favTitle: "⭐ Recettes Préférées", noFavs: "Aucune", confirmBorrar: "Supprimer?", lblVoz: "🔊 Lecture vocale", lblTono: "🎚 Hauteur", btnBorrarFavs: "🗑️ Supprimer favoris", btnGuardarFav: "⭐ Enregistrer favoris" },
+  it: { welcome: "Ciao! Dimmi cosa hai e troverò la ricetta.", placeholder: "Es: torta, pizza...", btnGenerar: "Genera ricetta", thinking: "📖 Ricerca...", disclaimer: "⚠️ L'IA può commettere errori.", favTitle: "⭐ Ricette Preferite", noFavs: "Nessuna salvata", confirmBorrar: "Cancellare?", lblVoz: "🔊 Lettura", lblTono: "🎚 Tono", btnBorrarFavs: "🗑️ Cancella preferiti", btnGuardarFav: "⭐ Salva nei Preferiti" }
 };
-</script>
-</body>
-</html>
+function toggleSettings() { settingsMenu.classList.toggle("open"); }
+function toggleDark() { document.body.classList.toggle("dark"); }
+async function llamarIA(ing) {
+  await new Promise(r => setTimeout(r, 600)); const q = ing.toLowerCase(); tGl = ing.toUpperCase();
+  const lib = {
+    pastel: "🎂 **Pastel de Vainilla Casero**\n\n**Ingredientes:** 2 tazas de harina, 1 taza de azúcar, 3 huevos, 1/2 taza de manteca, 1 taza de leche, 1 cdita de vainilla, 1 cda de polvo de hornear.\n\n**Pasos:**\n1. Batir manteca con azúcar hasta cremar.\n2. Agregar huevos y vainilla sin dejar de batir.\n3. Incorporar harina y polvo de hornear, alternando con leche.\n4. Hornear en molde enharinado a 180°C por 40-45 minutos.",
+    milanesa: "🥩 **Milanesas con Papas Fritas**\n\n**Ingredientes:** 4 filetes de carne, 2 huevos, pan rallado, ajo, perejil, sal, 3 papas.\n\n**Pasos:**\n1. Batir huevos con ajo, perejil y sal.\n2. Pasar la carne por el huevo y rebozar presionando en pan rallado.\n3. Cortar las papas en bastones y freírlas en aceite bien caliente.\n4. Freír o cocinar al horno las milanesas 4 minutos por lado.",
+    pizza: "🍕 **Pizza de Muzzarella**\n\n**Ingredientes:** 250g harina, 150ml agua tibia, 5g levadura, 1 cda aceite, salsa tomate, 200g muzzarella.\n\n**Pasos:**\n1. Integrar harina, levadura disuelta, agua, sal, aceite y amasar 5 min.\n2. Dejar levar tapado por 40 min.\n3. Estirar en molde aceitado, untar salsa y precocinar 10 min.\n4. Cubrir con muzzarella y hornear hasta derretir.",
+    pasta: "🍝 **Fideos con Salsa Bolognesa**\n\n**Ingredientes:** 200g fideos, 250g carne picada, 1 lata puré de tomate, 1 cebolla, 1 ajo.\n\n**Pasos:**\n1. Saltear cebolla y ajo picados en aceite.\n2. Sumar carne picada hasta dorar, verter puré de tomate y cocinar 15 min.\n3. Hervir los fideos en agua con sal.\n4. Escurrir los fideos y servir calientes con la salsa encima.",
+    hamburguesa: "🍔 **Hamburguesa Completa**\n\n**Ingredientes:** 200g carne picada, 1 pan, 1 feta cheddar, lechuga, tomate, sal.\n\n**Pasos:**\n1. Moldear la carne picada con sal de forma redonda.\n2. Cocinar en sartén bien caliente por 4 minutos de cada lado.\n3. Colocar cheddar arriba de la carne el último minuto para fundir.\n4. Tostar panes y armar sándwich junto a lechuga y tomate.",
+    ensalada: "🥗 **Ensalada César**\n\n**Ingredientes:** Lechuga romana, 100g pollo, pan tostado, queso rallado, aderezo.\n\n**Pasos:**\n1. Cocinar el pollo a la plancha con sal y cortarlo en tiras.\n2. Trocear la lechuga limpia con las manos en un bol amplio.\n3. Añadir el pollo tibio y cubitos de pan tostado.\n4. Espolvorear queso, rociar aderezo y mezclar bien."
+  };
+  return lib[Object.keys(lib).find(k => q.includes(k))] || `🍳 **Guía de Cocina:**\n\nNo tengo ese plato registrado, pero puedes improvisar un salteado:\n1. Corta tus ingredientes en cubos medianos.\n2. Calienta una sartén con aceite y ajo.\n3. Saltea todo a fuego medio por 12-15 min.\n4. Condimenta con sal y sirve caliente.`;
+}
+
+async function enviar() {
+  const t = input.value.trim(); if(!t) return;
+  const ln = idioma.value, tff = txUI[ln] || txUI.es;
+  const uMsg = document.createElement("div"); uMsg.className = "msg user"; uMsg.textContent = t; chat.appendChild(uMsg);
+  input.value = ""; chat.scrollTop = chat.scrollHeight;
+  btn.disabled = true; btn.textContent = tff.thinking;
+  const iaMsg = document.createElement("div"); iaMsg.className = "msg ia"; iaMsg.textContent = "..."; chat.appendChild(iaMsg);
+  const rIA = await llamarIA(t);
+  iaMsg.innerHTML = `<strong>${tGl || t}</strong><br><br>${rIA}`;
+  const favBtn = document.createElement("button"); favBtn.className = "btn-fav-add"; favBtn.textContent = tff.btnGuardarFav;
+  favBtn.onclick = function() { agregarFavorito(tGl || t, rIA); };
+  iaMsg.appendChild(favBtn); chat.scrollTop = chat.scrollHeight;
+  btn.disabled = false; btn.textContent = tff.btnGenerar;
+  if (voz.checked) { hablar(rIA, ln); }
+}
+
+function hablar(txt, lang) {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(txt.replace(/\*|#/g, "").substring(0, 300));
+    u.lang = lang; u.pitch = parseFloat(tono.value) || 1; window.speechSynthesis.speak(u);
+  }
+}
+
+function cargarFavoritos() {
+  const fvs = JSON.parse(localStorage.getItem("foodFavs")) || [], ln = idioma.value;
+  if (fvs.length === 0) { favBox.innerHTML = `<span style="font-size:0.9rem; color:#888;">${txUI[ln].noFavs}</span>`; return; }
+  favBox.innerHTML = "";
+  fvs.forEach((f) => {
+    const item = document.createElement("div"); item.className = "fav-item"; item.innerHTML = `<span>🍽️ ${f.titulo}</span>`;
+    const vBtn = document.createElement("button"); vBtn.textContent = "👁️";
+    vBtn.onclick = () => {
+      const iaMsg = document.createElement("div"); iaMsg.className = "msg ia"; iaMsg.innerHTML = `<strong>${f.titulo}</strong><br><br>${f.receta}`;
+      chat.appendChild(iaMsg); chat.scrollTop = chat.scrollHeight;
+    };
+    item.appendChild(vBtn); favBox.appendChild(item);
+  });
+}
+
+function agregarFavorito(tit, rec) {
+  let fvs = JSON.parse(localStorage.getItem("foodFavs")) || [];
+  if (!fvs.some(f => f.titulo === tit)) { fvs.push({ titulo: tit, receta: rec }); localStorage.setItem("foodFavs", JSON.stringify(fvs)); cargarFavoritos(); }
+}
+
+function vaciarFavs() { const ln = idioma.value; if(confirm(txUI[ln].confirmBorrar)) { localStorage.removeItem("foodFavs"); cargarFavoritos(); } }
+
+function cambiarIdiomaInterfaz() {
+  const ln = idioma.value, tff = txUI[ln] || txUI.es;
+  document.getElementById("welcomeMsg").textContent = tff.welcome; input.placeholder = tff.placeholder; btn.textContent = tff.btnGenerar;
+  document.getElementById("disclaimerTxt").textContent = tff.disclaimer; document.getElementById("lblFavs").textContent = tff.favTitle;
+  document.getElementById("lblVoz").textContent = tff.lblVoz; document.getElementById("lblTono").textContent = tff.lblTono;
+  document.getElementById("btnBorrarFavs").textContent = tff.btnBorrarFavs; cargarFavoritos();
+}
+window.onload = function() { cargarFavoritos(); };
+</script></body></html>
