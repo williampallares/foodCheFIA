@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>foodChefIA - ¡Resuelve tu cena en minutos!</title>
+    <style>
+        /* VARIABLES DE TU IA Y COLORES DE LA LANDING */
+        :root {
+            --bg: #f4f6f8;
+            --card: #ffffff;
+            --text: #222222;
+            --primary: #ff5722; /* Naranja Chef unificado */
+            --secondary: #eaeaea;
+            --success: #2e7d32;
+            --success-bg: #e8f5e9;
+        }
+        body.dark {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #ffffff;
+            --secondary: #2a2a2a;
+            --primary: #ff8c00;
+        }
+        
+        body {
+            margin: 0;
+            font-family: "Segoe UI", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card);
+            padding: 25px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            position: relative;
+            margin: 20px;
+            box-sizing: border-box;
+        }
+
+        /* --- ESTILOS DE TU LANDING PAGE --- */
+        #seccion-landing { text-align: center; }
+        .pregunta { color: #777; font-size: 1.2rem; font-weight: 500; margin-bottom: 5px; }
+        .titulo { font-size: 2.1rem; color: var(--text); margin-top: 0; line-height: 1.2; }
+        .marca { color: var(--primary); font-weight: bold; }
+        .ventajas { font-size: 1rem; color: var(--success); font-weight: bold; background-color: var(--success-bg); padding: 8px 16px; border-radius: 30px; display: inline-block; margin: 15px 0 25px 0; }
+        .input-email { padding: 15px; font-size: 1rem; width: 100%; border: 2px solid #e0e0e0; border-radius: 12px; outline: none; transition: border-color 0.3s; margin-bottom: 15px; box-sizing: border-box; background: var(--card); color: var(--text); }
+        .input-email:focus { border-color: var(--primary); }
+
+        /* --- ESTILOS ORIGINALES DE TU IA --- */
+        #seccion-ia { display: none; } /* Oculto al principio */
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; font-weight: bold; border-bottom: 1px solid var(--secondary); margin-bottom: 15px; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .toggle { background: #222; color: white; padding: 6px 12px; border-radius: 10px; cursor: pointer; user-select: none; font-size: 0.9rem; }
+        body.dark .toggle { background: #fff; color: #222; }
+        .chat { height: 280px; overflow-y: auto; background: var(--secondary); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+        .msg { padding: 12px 16px; border-radius: 14px; max-width: 85%; line-height: 1.5; font-size: 0.95rem; white-space: pre-wrap; position: relative; }
+        .user { background: var(--primary); color: white; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .ia { background: var(--card); color: var(--text); align-self: flex-start; border-bottom-left-radius: 2px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        input, select { width: 100%; padding: 12px; margin-top: 10px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; outline: none; background: var(--card); color: var(--text); font-size: 0.95rem; }
+        
+        /* BOTÓN UNIFICADO */
+        .boton-principal { padding: 15px; border: none; border-radius: 12px; background: var(--primary); color: white; cursor: pointer; margin-top: 10px; width: 100%; font-weight: bold; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(255, 87, 34, 0.2); transition: background 0.2s, transform 0.1s; }
+        .boton-principal:hover { filter: brightness(0.9); transform: translateY(-1px); }
+        
+        /* COMPONENTES EXTRAS DE TU IA */
+        .fav-box { margin-top: 15px; background: var(--secondary); padding: 12px; border-radius: 10px; color: var(--text); }
+        .fav-item { margin-top: 8px; display: flex; align-items: center; justify-content: space-between; background: var(--card); padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .fav-item button { margin-left: 5px; padding: 4px 8px; font-size: 11px; width: auto; margin-top: 0; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .settings-menu { display: none; position: absolute; top: 60px; right: 15px; width: 260px; background: var(--card); border: 1px solid var(--secondary); border-radius: 12px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 100; box-sizing: border-box;}
+        .settings-menu.open { display: block; }
+        .setting-option { margin-bottom: 12px; font-size: 0.9rem; }
+        .setting-option label { display: flex; justify-content: space-between; align-items: center; }
+        .btn-secondary { background: #6c757d; font-size: 0.85rem; padding: 8px; border: none; border-radius: 8px; color: white; cursor: pointer; width: 100%; font-weight: bold; }
+        .disclaimer { text-align: center; font-size: 11px; color: #888; margin-top: 10px; }
+
+        /* RECETAS GUARDADAS */
+        .btn-guardar-receta { margin-top: 6px; padding: 8px 14px; border: none; border-radius: 8px; background: var(--primary); color: #fff; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .btn-guardar-receta:disabled { opacity: 0.6; cursor: default; }
+        .fav-item span:first-child { padding-right: 8px; }
+
+        /* ============ OPTIMIZACIÓN PARA PC ============ */
+        @media (min-width: 900px) {
+            body { align-items: flex-start; padding: 40px 0; box-sizing: border-box; }
+            .container { max-width: 720px; padding: 56px 64px; margin: auto; border-radius: 20px; }
+            .container:has(#seccion-ia[style*="block"]) { max-width: 1120px; padding: 32px 40px; }
+
+            /* Landing */
+            .pregunta { font-size: 1.4rem; }
+            .titulo { font-size: 3rem; line-height: 1.15; margin-bottom: 8px; }
+            .ventajas { font-size: 1.05rem; margin: 20px 0 34px 0; }
+            .formulario-box { display: flex; gap: 12px; align-items: stretch; }
+            .formulario-box br { display: none; }
+            .input-email { margin-bottom: 0; font-size: 1.1rem; flex: 1; }
+            .formulario-box .boton-principal { width: auto; margin-top: 0; padding: 15px 32px; white-space: nowrap; }
+
+            /* App */
+            .header { font-size: 1.25rem; padding-bottom: 18px; margin-bottom: 22px; }
+            .toggle:hover { opacity: 0.85; }
+            .ia-layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 28px; align-items: start; }
+            .chat { height: calc(100vh - 360px); min-height: 380px; max-height: 640px; padding: 18px; }
+            .msg { max-width: 78%; font-size: 1rem; }
+            .ia-side .fav-box { margin-top: 0; position: sticky; top: 20px; max-height: calc(100vh - 160px); overflow-y: auto; }
+            .settings-menu { top: 78px; right: 40px; width: 300px; }
+            .boton-principal:active { transform: translateY(0); }
+        }
+        @media (min-width: 1400px) {
+            .container:has(#seccion-ia[style*="block"]) { max-width: 1240px; }
+        }
+
+        /* ============ OPTIMIZACIÓN PARA CELULAR Y TABLET ============ */
+        @media (max-width: 899px) {
+            html { -webkit-text-size-adjust: 100%; }
+            body { align-items: flex-start; min-height: 100vh; min-height: 100dvh; }
+            .container { margin: 12px; width: auto; max-width: 640px; margin-left: auto; margin-right: auto; padding: 22px 18px; }
+            .ia-side { margin-top: 0; }
+            /* 16px evita el zoom automático de iOS al enfocar un campo */
+            input, select, .input-email { font-size: 16px; min-height: 46px; }
+            .boton-principal { min-height: 50px; }
+            .toggle { padding: 10px 14px; min-height: 40px; box-sizing: border-box; display: flex; align-items: center; }
+            .header { font-size: 1.1rem; }
+            .chat { height: calc(100vh - 380px); height: calc(100dvh - 380px); min-height: 240px; max-height: 480px; }
+            .msg { max-width: 92%; }
+            .settings-menu { right: 12px; left: 12px; width: auto; top: 72px; max-height: 70vh; overflow-y: auto; }
+            .fav-item { flex-wrap: wrap; gap: 6px; }
+            .fav-item button { padding: 8px 12px; font-size: 12px; min-height: 36px; }
+            .btn-secondary { min-height: 44px; }
+        }
+        @media (max-width: 480px) {
+            .container { margin: 8px; padding: 18px 14px; border-radius: 14px; }
+            .pregunta { font-size: 1.05rem; }
+            .titulo { font-size: 1.7rem; }
+            .ventajas { font-size: 0.85rem; padding: 8px 12px; border-radius: 18px; line-height: 1.5; }
+            #seccion-landing .boton-principal { font-size: 1.05rem; }
+            .chat { padding: 10px; }
+            .msg { font-size: 0.92rem; padding: 10px 14px; }
+        }
+        @media (max-height: 500px) and (orientation: landscape) {
+            .chat { height: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ================= SECCIÓN 1: LANDING PAGE ================= -->
+    <div id="seccion-landing">
+        <div style="display:flex; justify-content:flex-end; margin-bottom:10px;">
+            <select id="idiomaLanding" onchange="cambiarIdiomaDesdeLanding()" aria-label="Idioma / Language"
+                    style="width:auto; margin-top:0; padding:6px 10px; font-size:0.85rem; cursor:pointer;">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="pt">Português</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+            </select>
+        </div>
+        <p class="pregunta" id="text-pregunta">¿Sin tiempo para la cena?</p>
+        <h1 class="titulo" id="text-titulo">
+            Recetas rápidas de internet en segundos
+        </h1>
+        <div class="ventajas" id="text-ventajas">
+            SIN anuncios &nbsp;|&nbsp; SIN suscripciones molestas
+        </div>
+        <div class="formulario-box">
+            <input type="email" id="input-email" class="input-email" placeholder="Ingresa tu correo aquí..." required>
+            <br>
+            <button type="button" class="boton-principal" id="btn-submit" onclick="conectarLandingConIA()">
+                ¡Quiero mis recetas!
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN 2: TU IA DE COCINA ================= -->
+    <div id="seccion-ia">
+        <div class="header">
+            <span class="logo">foodChefIA</span>
+            <div class="header-actions">
+                <div class="toggle" id="btnAjustes" onclick="toggleSettings()">Ajustes</div>
+                <div class="toggle" id="btnSol" onclick="toggleDark()">Tema</div>
+            </div>
+        </div>
+
+        <div id="settingsMenu" class="settings-menu">
+            <div class="setting-option"><label><b id="lblVoz">Lectura por voz</b><input type="checkbox" id="voz"></label></div>
+            <div class="setting-option"><label><b id="lblTono">Tono de voz</b><input type="range" id="tono" min="0.5" max="2" step="0.1" value="1"></label></div>
+            <div class="setting-option"><b id="lblAlergias">Alergias o restricciones</b><input id="alergias" maxlength="150" placeholder="Ej: gluten, maní, lactosa, vegano"></div>
+            <button class="btn-secondary" id="btnBorrarFavs" onclick="vaciarFavs()">Borrar todos los favoritos</button>
+            <button class="btn-secondary" id="btnCerrarSesion" onclick="cerrarSesion()" style="margin-top:8px;">Cerrar sesión</button>
+        </div>
+
+        <div class="ia-layout">
+        <div class="ia-main">
+        <div id="chat" class="chat">
+            <div class="msg ia" id="welcomeMsg">¡Hola! Decime qué tenés en la heladera, o contame tu caso (ej: «quiero hacer pizza pero soy celíaco y tengo 30 min») y te busco la receta.</div>
+        </div>
+
+        <input id="input" placeholder="Ej: pizza, arroz y huevo... o «quiero pizza, soy celíaco, 30 min»" onkeydown="if(event.key==='Enter') enviar()">
+        
+        <select id="idioma" onchange="cambiarIdiomaInterfaz()">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+            <option value="pt">Português</option>
+            <option value="fr">Français</option>
+            <option value="it">Italiano</option>
+        </select>
+        
+        <button class="boton-principal" id="btn" onclick="enviar()">Generar receta</button>
+        <p class="disclaimer" id="disclaimerTxt">La IA puede cometer errores.</p>
+        </div>
+        <aside class="ia-side">
+        <div class="fav-box"><b id="lblFavs">Recetas Favoritas</b><div id="fav"></div></div>
+        </aside>
+        </div>
+    </div>
+
+</div>
+
+<!-- LLAMAMOS AL ARCHIVO DE LÓGICA JAVASCRIPT EXTERN0 -->
+<script src="script.js"></script>
+</body>
+</html>
